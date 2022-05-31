@@ -9,13 +9,12 @@ function UEDynamicFilters(){
 		PAGINATION:"pagination",
 		LOADMORE:"loadmore",
 		TERMS_LIST:"terms_list",
-		CHECKBOX: "checkbox"
+		SEARCH: "search"
 	};
 	
 	var g_vars = {
 		CLASS_DIV_DEBUG:"uc-div-ajax-debug",
 		CLASS_GRID:"uc-filterable-grid",		
-		handleTrashold:null,
 		DEBUG_AJAX_OPTIONS: false,
 		CLASS_CLICKED:"uc-clicked",
 		CLASS_HIDDEN: "uc-filter-hidden",
@@ -186,6 +185,9 @@ function UEDynamicFilters(){
 	/**
 	 * get closest grid to some object
 	 */
+	/**
+	 * get closest grid to some object
+	 */
 	function getClosestGrid(objSource){
 		
 		//in case there is only one grid - return it
@@ -202,49 +204,24 @@ function UEDynamicFilters(){
 		var objSection = objSource.parents("section");
 		
 		var objGrid = objSection.find("."+ g_vars.CLASS_GRID);
-				
+		
 		if(objGrid.length == 1)
 			return(objGrid);
 				
 		//get closest by offset
-		var type = getFilterType(objSource);
 		
-		switch(type){
-			case g_types.LOADMORE:
-			case g_types.PAGINATION:
-				var objSingleGrid = getClosestByOffset(objGrid, objSource, true);
+		var objSingleGrid = getClosestByOffset(objGrid, objSource, true);
 				
-				return(objSingleGrid);
-				
-			break;
-		}
-		
-		
-		//get by next or prev section
-		
-		var objPrevSection = objSection;
-		var objNextSection = objSection;
-		
-		//get from previous section
-		do{
-			objPrevSection = objPrevSection.prev();
-			objNextSection = objNextSection.next();
-			
-			objGrid = objPrevSection.find("."+ g_vars.CLASS_GRID);
-			if(objGrid.length == 1)
-				return(objGrid);
-			
-			objGrid = objNextSection.find("."+ g_vars.CLASS_GRID);
-			if(objGrid.length == 1)
-				return(objGrid);
-			
-		}while(objNextSection.length != 0 && objNextSection != 0);
+		if(objSingleGrid.length == 1)
+			return(objSingleGrid);		
 		
 		//return first grid in the list
 		
 		var objFirstGrid = jQuery(objGrids[0]);
+		
 		return(objFirstGrid);
 	}
+	
 	
 	
 	/**
@@ -511,8 +488,7 @@ function UEDynamicFilters(){
 		
 		if(filterType)
 			return(filterType);
-		
-		trace(objFilter);
+				
 		throw new Error("wrong filter type");
 		
 		return(null);
@@ -634,7 +610,6 @@ function UEDynamicFilters(){
 		
 		objPagination.addClass(g_vars.CLASS_CLICKED);
 		
-		
 		refreshAjaxGrid(objGrid);
 		
 		event.preventDefault();
@@ -713,76 +688,6 @@ function UEDynamicFilters(){
 		
 	}
 	
-	function ________CHECKBOX_______________(){}
-	
-	/**
-	 * init checkbox filter - uncheck all checkboxes if checked by cache
-	 */
-	function initCheckboxFilter(){
-		
-		var objChecks = jQuery(".ue-filter-checkbox__check");
-		
-		objChecks.each(function(index, check){
-			
-			var objCheck = jQuery(check);
-			
-			var hasAttr = objCheck.attr("checked");
-			
-			if(!hasAttr)
-				objCheck.prop("checked",false);				
-			
-		});
-				
-	}
-	
-	
-	/**
-	 * add checkbox terms to terms list
-	 */
-	function addCheckboxTerms(objFilter, arrTerms){
-		
-		var objChecks = jQuery(".ue-filter-checkbox__check");
-		
-		jQuery.each(objChecks, function(index, check){
-			
-			var objCheck = jQuery(check);
-			
-			var isChecked = objCheck.is(":checked");
-			
-			if(isChecked == false)
-				return(true);
-			
-			var slug = objCheck.data("slug");
-			var taxonomy = objCheck.data("taxonomy");
-			
-			var objTerm = {
-				"slug": slug,
-				"taxonomy": taxonomy
-			};
-			
-			arrTerms.push(objTerm);
-			
-		});
-		
-		return(arrTerms);
-	}
-	
-	
-	/**
-	 * on checkbox change
-	 */
-	function onCheckboxChange(){
-		
-		var objLink = jQuery(this);
-		var objCheckboxFilter = objLink.parents(".uc-grid-filter");
-		setNoRefreshFilter(objCheckboxFilter);		
-		
-		//refresh grid
-		var objGrid = objCheckboxFilter.data("grid");
-		
-		refreshAjaxGrid(objGrid);
-		
-	}
 	
 	
 	function ________TERMS_LIST_______________(){}
@@ -859,6 +764,23 @@ function UEDynamicFilters(){
 		};
 		
 		return(objTerm);
+	}
+
+	function ________GENERAL_FILTER_______________(){}
+	
+	
+	/**
+	 * on general filter change
+	 */
+	function onFilterChange(){
+		
+		trace("filter change");
+		
+		var objFilter = jQuery(this);
+		
+		trace(objFilter);
+		
+		
 	}
 	
 	function ________INIT_FILTERS_______________(){}
@@ -1797,11 +1719,6 @@ function UEDynamicFilters(){
 						isReplaceMode = true;
 					
 				break;
-				case g_types.CHECKBOX:
-					
-					arrTerms = addCheckboxTerms(objFilter, arrTerms);
-											
-				break;
 				default:
 					throw new Error("Unknown filter type: "+type);
 				break;
@@ -1973,10 +1890,11 @@ function UEDynamicFilters(){
 	 * init the globals
 	 */
 	function initGlobals(){
-				
-		if(typeof g_strFiltersData != "undefined"){
-			g_filtersData = JSON.parse(g_strFiltersData);
-		}
+		
+		if(typeof g_strFiltersData === "undefined")
+			return(false);
+		
+		g_filtersData = JSON.parse(g_strFiltersData);
 		
 		if(jQuery.isEmptyObject(g_filtersData)){
 			
@@ -2059,12 +1977,10 @@ function UEDynamicFilters(){
 					objParent.on("click",".ue_taxonomy a.ue_taxonomy_item", onTermsLinkClick);
 					
 				break;
-				case g_types.CHECKBOX:
+				case g_types.SEARCH:
 					
-					initCheckboxFilter();
+					objParent.on("filter_change",".uc-search-filter__input", onFilterChange);
 					
-					objParent.on("change",".ue-filter-checkbox__check", onCheckboxChange);
-										
 				break;
 				default:
 					trace("init by type - unrecognized type: "+type);
@@ -2139,8 +2055,23 @@ function UEDynamicFilters(){
 		
 		var success = initGlobals();
 		
-		if(success == false)
+		//run again on fail 3 times
+		if(success == false){
+			
+			if(typeof window.ueFiltersTimeoutCounter != "undefined")
+					window.ueFiltersTimeoutCounter++;
+			else
+				window.ueFiltersTimeoutCounter = 0;
+			
+			if(window.ueFiltersTimeoutCounter == 3){
+				trace("Failed to init filters");
+				return(false);
+			}
+			
+			setTimeout(init, 200);
+			
 			return(false);
+		}
 		
 		//init remote object if exists
 		if(typeof UERemoteConnection == "function")

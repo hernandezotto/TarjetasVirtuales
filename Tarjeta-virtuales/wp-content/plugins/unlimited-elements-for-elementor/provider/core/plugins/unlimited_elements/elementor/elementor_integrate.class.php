@@ -396,7 +396,7 @@ class UniteCreatorElementorIntegrate{
      * register controls
      */
     public function onRegisterControls($controls_manager) {
-    	    	
+
     	self::logMemoryUsage("before controls registered");
     	    	
     	//add hr control
@@ -412,6 +412,7 @@ class UniteCreatorElementorIntegrate{
         $controls_manager->register(new Elementor\Control_UC_AddonSelector());
         
         //add select post type control
+                
     	require $this->pathControls."control_select_posttype.php";
         $controls_manager->register(new Elementor\Control_UC_SelectSpecial);
         
@@ -1595,7 +1596,7 @@ class UniteCreatorElementorIntegrate{
     	
     	add_action('elementor/frontend/after_register_scripts', array($this, 'onRegisterFrontScripts'), 10);
     	add_action('elementor/editor/after_enqueue_scripts', array($this, 'onEnqueueEditorScripts'), 10);
-		    	
+		
     	add_action('elementor/controls/register', array($this, 'onRegisterControls'));
     	
     	add_action('elementor/frontend/after_enqueue_scripts', array($this, 'onFrontendAfterRegisterControls'));

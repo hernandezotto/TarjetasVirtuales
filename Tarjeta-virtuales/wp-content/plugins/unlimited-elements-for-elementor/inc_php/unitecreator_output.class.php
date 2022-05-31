@@ -1401,14 +1401,14 @@ class UniteCreatorOutputWork extends HtmlOutputBaseUC{
 		echo "<div style='font-size:16px;color:black;text-decoration:none;background-color:white;'>";
 		
 		dmp("<b>Widget Debug Data</b> (turned on by setting in widget advanced section)<br>");
-		
+				
 		//get data from listing
-		$paramListing = $this->addon->getParamByType(UniteCreatorDialogParam::PARAM_LISTING);
+		$paramListing = $this->addon->getListingParamForOutput();
 		
-		if(!empty($paramListing)){
+		if(!empty($paramListing) && $this->itemsType == "template"){
+			
 			$arrItemData = $this->putDebugDataHtml_getItemsFromListing($paramListing, $arrData);
-		}		
-		
+		}
 		
 		switch($this->debugDataType){
 			case "post_titles":
@@ -1836,6 +1836,80 @@ class UniteCreatorOutputWork extends HtmlOutputBaseUC{
 		return($output);
 	}
 	
+	/**
+	 * get params for modify
+	 */
+	private function modifyTemplatesForOutput_getParamsForModify(){
+		
+		$arrParams = $this->addon->getParams();
+		
+		$arrParamsForModify = array();
+		
+		foreach($arrParams as $param){
+			
+			$type = UniteFunctionsUC::getVal($param, "type");
+			
+			if($type != UniteCreatorDialogParam::PARAM_SPECIAL)
+				continue;
+			
+			$attributeType = UniteFunctionsUC::getVal($param, "attribute_type");
+			
+			switch($attributeType){
+				
+				case "entrance_animation":
+					
+					$param["modify_type"] = $attributeType;
+					
+					$arrParamsForModify[] = $param;
+				break;
+			}			
+		}
+		
+		return($arrParamsForModify);
+	}
+	
+	
+	/**
+	 * modify template for output, add some code according the params
+	 */
+	private function modifyTemplatesForOutput($html, $css, $js){
+		
+		$isModify = false;
+		
+		$arrParams = $this->modifyTemplatesForOutput_getParamsForModify();
+		
+		if(empty($arrParams))
+			return(null);
+		
+		foreach($arrParams as $param){
+			
+			$name = UniteFunctionsUC::getVal($param, "name");
+			$type = UniteFunctionsUC::getVal($param, "modify_type");
+								
+			switch($type){
+				case "entrance_animation":
+					
+					$css = "{{ucfunc(\"put_entrance_animation_css\",\"{$name}\")}}\n\n".$css;
+					$js = "{{ucfunc(\"put_entrance_animation_js\",\"{$name}\")}}\n\n".$js;
+					
+					$isModify = true;
+				break;
+			}
+			
+		}
+		
+		if($isModify == false)
+			return(null);
+		
+		
+		$output = array();
+		$output["html"] = $html;
+		$output["css"] = $css;
+		$output["js"] = $js;
+		
+		return($output);
+	}
+	
 	
 	/**
 	 * init the template
@@ -1848,23 +1922,33 @@ class UniteCreatorOutputWork extends HtmlOutputBaseUC{
 		$arrData = $this->getConstantData();
 		
 		$arrParams = $this->getAddonParams();
-				
+		
 		$arrData = array_merge($arrData, $arrParams);
 		
 		//set templates
 		$html = $this->addon->getHtml();
 		$css = $this->addon->getCss();
-				
+		
 		//set item css call
 		$cssItem = $this->addon->getCssItem();
 		$cssItem = trim($cssItem);
 		if(!empty($cssItem))
 			$css .= "\n{{put_css_items()}}";
 		
+			
 		$js = $this->addon->getJs();
 		
-		$this->objTemplate->setAddon($this->addon);
+		$arrModify = $this->modifyTemplatesForOutput($html, $css, $js);
 		
+		if(!empty($arrModify)){
+			$html = $arrModify["html"];
+			$css = $arrModify["css"];
+			$js = $arrModify["js"];
+		}
+		
+		
+		$this->objTemplate->setAddon($this->addon);
+				
 		$this->objTemplate->addTemplate(self::TEMPLATE_HTML, $html);
 		$this->objTemplate->addTemplate(self::TEMPLATE_CSS, $css);
 		$this->objTemplate->addTemplate(self::TEMPLATE_JS, $js);
@@ -1928,8 +2012,7 @@ class UniteCreatorOutputWork extends HtmlOutputBaseUC{
 				break;
 				case "listing":
 					
-					$paramListing = $this->addon->getParamByType(UniteCreatorDialogParam::PARAM_LISTING);
-					
+					$paramListing = $this->addon->getListingParamForOutput();
 					
 					if(empty($paramListing))
 						UniteFunctionsUC::throwError("Some listing param should be found");
@@ -1943,6 +2026,22 @@ class UniteCreatorOutputWork extends HtmlOutputBaseUC{
 					else
 						$arrItemData = $this->normalizeItemsData($arrItemData, $paramName);
 											
+				break;
+				case "multisource":
+					
+					$paramListing = $this->addon->getListingParamForOutput();
+					
+					if(empty($paramListing))
+						UniteFunctionsUC::throwError("Some multisource dynamic attribute should be found");
+					
+					$paramName = UniteFunctionsUC::getVal($paramListing, "name");
+					
+					$dataValue = UniteFunctionsUC::getVal($arrData, $paramName);
+					
+					if(is_string($dataValue) && $dataValue === "uc_items")
+						$arrItemData = $this->addon->getProcessedItemsData($this->processType);
+					
+						
 				break;
 				default:
 					
@@ -1965,6 +2064,7 @@ class UniteCreatorOutputWork extends HtmlOutputBaseUC{
 							
 			$this->objTemplate->setParams($arrData);
 			
+			
 			$this->objTemplate->setArrItems($arrItemData);
 			
 			$htmlItem = $this->addon->getHtmlItem();
@@ -1984,6 +2084,7 @@ class UniteCreatorOutputWork extends HtmlOutputBaseUC{
 			if(!empty($paramPostsList) && is_array($paramPostsList))
 				$arrData = array_merge($arrData, $postListValue);
 		}
+		
 		
 		//show debug data
 		if($this->isShowDebugData == true)
@@ -2018,7 +2119,7 @@ class UniteCreatorOutputWork extends HtmlOutputBaseUC{
 			
 		$this->addon = $addon;
 		$this->isItemsExists = $this->addon->isHasItems();
-		
+				
 		$this->itemsType = $this->addon->getItemsType();
 		
 		$this->arrOptions = $this->addon->getOptions();
@@ -2029,6 +2130,7 @@ class UniteCreatorOutputWork extends HtmlOutputBaseUC{
 			case "instagram":
 			case "post":
 			case "listing":
+			case "multisource":
 				$this->isItemsExists = true;
 			break;
 		}

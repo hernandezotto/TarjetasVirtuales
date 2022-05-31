@@ -509,7 +509,7 @@ class UniteCreatorDialogParamElementor extends UniteCreatorDialogParam{
 			</table>
 		<?php 
 		
-		$this->addResponsiveInputs("slider");
+		$this->addResponsiveInputs("radio_boolean");
 		
 			
 	}
@@ -876,11 +876,12 @@ class UniteCreatorDialogParamElementor extends UniteCreatorDialogParam{
 	protected function putSpecialAttribute(){
 		
 		$arrTypes = array();
-		$arrTypes["refresh"] = __("Refresh Widget","unlimited-elements-for-elementor");
-				
+		$arrTypes["non"] = __("[Select Type]","unlimited-elements-for-elementor");
+		$arrTypes["entrance_animation"] = __("Entrance Animation","unlimited-elements-for-elementor");
+		
 		$optionsClass = "uc-special-attribute-options";
 		
-		$htmlSelectTypes = HelperHtmlUC::getHTMLSelect($arrTypes, "", "name='attribute_type' xclass='uc-control' xdata-controlled-selector='.{$optionsClass}'", true, "refresh");
+		$htmlSelectTypes = HelperHtmlUC::getHTMLSelect($arrTypes, "", "name='attribute_type' class='uc-control' data-controlled-selector='.{$optionsClass}'", true, "refresh");
 		
 		?>
 		
@@ -890,15 +891,15 @@ class UniteCreatorDialogParamElementor extends UniteCreatorDialogParam{
 			
 			<?php echo $htmlSelectTypes?>
 			
-			<div class="vert_sap10"></div>
+			<div class="vert_sap30"></div>
  		    
- 		    <div class="<?php echo $optionsClass?>" data-control-value="refresh">
- 		    	
-	 		    <p>
-	 		    <?php _e("Choose attribute names comma separated, in this section that will trigger refresh","unlimited-elements-for-elementor")?>
-	 		    </p>
-	 		    
- 		    	<input type="text" name="refresh_attribute_names" value="">
+ 		    <div class="<?php echo $optionsClass?>" data-control="entrance_animation" style="display:none">
+				
+				<div class="unite-inputs-label">
+			 		    <?php _e("Item Class","unlimited-elements-for-elementor")?>		
+				</div>
+ 		    		 		    
+ 		    	<input type="text" name="entrance_animation_item_class" value="" placeholder="Example: ue-item">
 	 		    
 			</div>
 		<?php 

@@ -1590,7 +1590,45 @@ class UniteCreatorAddons extends UniteElementsBaseUC{
 		
 	}
 	
+	/**
+	 * install addons from catalog if not exists
+	 */
+	public function installMultipleAddons($arrAddonNames, $addonType){
+		
+		if(empty($addonType))
+			return(false);
+		
+		if(empty($arrAddonNames))
+			return(false);
+		
+		$numAddons = count($arrAddonNames);
+		
+		if($numAddons > 25)
+			UniteFunctionsUC::throwError("Too much widgets to install: $numAddons");
+		
+		$webAPI = new UniteCreatorWebAPI();
+		
+		$strLog = "";
+		
+		foreach($arrAddonNames as $alias){
+			
+			$isExists = $this->isAddonExistsByName($alias, $addonType);
+			
+			if(!empty($strLog))
+				$strLog .= "\n"; 
+			
+			if($isExists == true){
+				$strLog .= "Skipped widget install: $alias";
+				continue;
+			}
+						
+			$strLog .= $webAPI->installCatalogAddonByName($alias, $addonType);
+		}
+		
+		
+		return($strLog);
+	}
+	
 	
 }
 
-?>

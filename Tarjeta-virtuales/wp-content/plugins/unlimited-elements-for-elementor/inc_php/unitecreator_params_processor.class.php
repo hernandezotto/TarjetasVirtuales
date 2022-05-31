@@ -479,6 +479,7 @@ class UniteCreatorParamsProcessorWork{
 				case UniteCreatorDialogParam::PARAM_DROPDOWN:
 				case UniteCreatorDialogParam::PARAM_FONT_OVERRIDE:
 				case UniteCreatorDialogParam::PARAM_POSTS_LIST:
+				case UniteCreatorDialogParam::PARAM_SPECIAL:
 				case UniteCreatorDialogParam::PARAM_POST_TERMS:
 				case UniteCreatorDialogParam::PARAM_WOO_CATS:
 				case UniteCreatorDialogParam::PARAM_INSTAGRAM:
@@ -1537,7 +1538,7 @@ class UniteCreatorParamsProcessorWork{
 		
 		if(is_array($value) == false){
 			$data[$name."_unit"] = "px";
-			$data[$name."_size"] = $value;
+			$data[$name."_nounit"] = $value;
 			return($data);
 		}
 				
@@ -1547,16 +1548,16 @@ class UniteCreatorParamsProcessorWork{
 		if(empty($unit))
 			$unit = "px";
 		
-		if(empty($size))
-			$size = 0;
-			
-		$data[$name] = $size.$unit;
+		if($size === ""){
+			$data[$name] = "";
+		}else
+			$data[$name] = $size.$unit;
 		
 		if($valueOnly == false){
 			$data[$name."_unit"] = $unit;
 			$data[$name."_nounit"] = $size;
 		}
-		
+				
 		return($data);
 	}
 	
@@ -1578,8 +1579,8 @@ class UniteCreatorParamsProcessorWork{
 			$valueTablet = UniteFunctionsUC::getVal($param, "value_tablet", $defaultValueTablet);
 			$valueMobile = UniteFunctionsUC::getVal($param, "value_mobile", $defaultValueMobile);
 			
-			$data = $this->getSliderData_work($data, $valueTablet, $name."_tablet", true);
-			$data = $this->getSliderData_work($data, $valueMobile, $name."_mobile", true);
+			$data = $this->getSliderData_work($data, $valueTablet, $name."_tablet");
+			$data = $this->getSliderData_work($data, $valueMobile, $name."_mobile");
 		}
 		
 		return($data);

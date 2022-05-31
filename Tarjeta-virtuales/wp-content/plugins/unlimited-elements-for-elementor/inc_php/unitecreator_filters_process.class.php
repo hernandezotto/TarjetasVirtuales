@@ -615,7 +615,7 @@ class UniteCreatorFiltersProcess{
 				
 		$paramPostList = $addon->getParamByType(UniteCreatorDialogParam::PARAM_POSTS_LIST);
 		
-		$paramListing = $addon->getParamByType(UniteCreatorDialogParam::PARAM_LISTING);
+		$paramListing = $addon->getListingParamForOutput();
 		
 		if(empty($paramPostList) && !empty($paramListing))
 			$paramPostList = $paramListing;
@@ -1066,6 +1066,7 @@ class UniteCreatorFiltersProcess{
 	}
 	
 	
+	
 	/**
 	 * get active archive terms
 	 */
@@ -1182,17 +1183,28 @@ class UniteCreatorFiltersProcess{
 		
 		//include some common url filters
 		$orderby = UniteFunctionsUC::getGetVar("orderby","",UniteFunctionsUC::SANITIZE_TEXT_FIELD);
-
-		if(!empty($orderby))
+		
+		if(!empty($orderby)){
+			$orderby = urlencode($orderby);
 			$urlBase = UniteFunctionsUC::addUrlParams($urlBase, "orderby=$orderby");
-					
+		}
+		
+		//include the search if exists
+		
+		$search = UniteFunctionsUC::getGetVar("s","",UniteFunctionsUC::SANITIZE_TEXT_FIELD);
+		
+		if(!empty($search)){
+			$search = urlencode($search);
+			$urlBase = UniteFunctionsUC::addUrlParams($urlBase, "s=$search");
+		}
+		
 		//get current filters
 		
 		$arrData = array();
 		$arrData["urlbase"] = $urlBase;
 		$arrData["urlajax"] = GlobalsUC::$url_ajax_full;
-		$arrData["querybase"] = self::$originalQueryVars;
-				
+		
+		//$arrData["querybase"] = self::$originalQueryVars;
 		
 		return($arrData);
 	}
@@ -1347,6 +1359,10 @@ class UniteCreatorFiltersProcess{
 		
 		//add first selected
 		
+		if(empty($arrTerms))
+			return($arrTerms);
+		
+		
 		foreach($arrTerms as $index => $term){
 			
 			$term["index"] = $index;
@@ -1449,7 +1465,10 @@ class UniteCreatorFiltersProcess{
 	 * set selected class by options
 	 */
 	private function modifyOutputTerms_setSelectedClass($arrTerms){
-	
+		
+		if(empty($arrTerms))
+			return($arrTerms);
+		
 		foreach($arrTerms as $index => $term){
 			
 			$isSelected = UniteFunctionsUC::getVal($term, "isselected");

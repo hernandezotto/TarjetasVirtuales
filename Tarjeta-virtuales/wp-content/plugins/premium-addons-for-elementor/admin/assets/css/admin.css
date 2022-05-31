@@ -131,16 +131,16 @@
     /* box-shadow: 0 2.5px 5px #b8b8b9; */
 }
 
-input:checked+.slider {
+.switch input:checked+.slider {
     background: #8dc900;
 }
 
-input:focus+.slider {
+.switch input:focus+.slider {
     -webkit-box-shadow: 0 0 1px #18a4fd;
     box-shadow: 0 0 1px #18a4fd;
 }
 
-input:checked+.slider:before {
+.switch input:checked+.slider:before {
     -webkit-transform: translate3d(20px, -50%, 0);
     transform: translate3d(20px, -50%, 0);
 }

@@ -12,7 +12,10 @@ defined ('UNLIMITED_ELEMENTS_INC') or die ('restricted aceess');
 
 class UniteCreatorPluginIntegrations{
 	
+	
 /* wp popular posts */
+	
+	private function ___________WP_POPULAR_POSTS_________(){}
 	
 	/**
 	 * return if exists wp popular posts
@@ -142,5 +145,103 @@ class UniteCreatorPluginIntegrations{
 		
         return $query;
 	}
+
+	private function ___________STICKY_POSTS_STITCH_________(){}
+	
+	/**
+	 * check if enabled sticky posts switch plugin
+	 */
+	public static function isStickySwitchPluginEnabled(){
+		
+		$isExists = class_exists('WP_Sticky_Posts_Switch');
+		
+		return($isExists);
+	}
+	
+	
+	/**
+	 * add sticky posts to a post list
+	 */
+	public static function checkAddStickyPosts($arrPosts, $args){
+		
+		$isExists = self::isStickySwitchPluginEnabled();
+		
+		if($isExists == false)
+			return($arrPosts);
+		
+        $arrStickyPostIDs = get_option('sticky_posts');
+		
+        if(empty($arrStickyPostIDs))
+        	return($arrPosts);
+                	
+        $arrStickyAssoc = UniteFunctionsUC::arrayToAssoc($arrStickyPostIDs);
+        	
+        $arrPostsNew = array();
+        
+        $countSticky = 0;
+        
+        $numOriginal = count($arrPosts);
+        
+        //remove the sticky from the list to the sticky assoc array if exists
+        
+        foreach($arrPosts as $post){
+        	
+        	$postID = $post->ID;
+
+        	$isSticky = isset($arrStickyAssoc[$postID]);
+		
+        	if($isSticky == false){
+        		$arrPostsNew[] = $post;
+        		continue;
+        	}
+        	
+        	$arrStickyAssoc[$postID] = $post;        	
+        	$countSticky++;
+        }
+        
+        //if all sticky found - then use the array, if not - get new posts
+		
+		if($countSticky != count($arrStickyAssoc)){
+			
+			$postType = UniteFunctionsUC::getVal($args, "post_type");
+			
+			if(empty($postType) || $postType == "post")
+				return($arrPosts);
+			
+			$argsSticky = array();
+			$argsSticky["post_type"] = $postType;
+			$argsSticky["post__in"] = $arrStickyPostIDs;
+			$argsSticky["post_status"] = "publish";
+			$argsSticky["nopaging"] = true;
+			$argsSticky["orderby"] = "post__in";
+			
+			$arrStickyAssoc = get_posts($argsSticky);
+		}
+        
+		if(empty($arrStickyAssoc))
+			return($arrPosts);
+		
+		//connect the arrays - sticky at the top
+		
+		$arrPostsOutput = array_values($arrStickyAssoc);
+
+		$numPostsNew = count($arrPostsOutput);
+				
+		foreach($arrPostsNew as $post){
+			
+			$arrPostsOutput[] = $post;
+			
+			//avoid more then original number of posts
+			
+			if($numPostsNew >= $numOriginal)
+				break;
+						
+			$numPostsNew++;
+		}
+		
+		
+		return($arrPostsOutput);
+	}
+	
 	
 }

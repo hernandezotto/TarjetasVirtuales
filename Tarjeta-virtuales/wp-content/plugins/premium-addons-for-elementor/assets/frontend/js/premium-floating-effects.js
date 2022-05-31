@@ -48,8 +48,8 @@
                 settings = {},
                 $widgetContainer = $scope.find('.elementor-widget-container')[0],
                 isInnerSection = $scope.closest('.elementor-section').hasClass('elementor-inner-section'),
-                sectionId = (isInnerSection) ? $scope.closest('.elementor-inner-section').data("model-cid") : $scope.closest('.elementor-top-section').data("model-cid"),
-                colId = (isInnerSection) ? $scope.closest('.elementor-inner-column').data("model-cid") : $scope.closest('.elementor-top-column').data("model-cid"),
+                sectionId = (isInnerSection) ? $scope.closest('.elementor-inner-section').data("model-cid") : getSectionID(),
+                colId = (isInnerSection) ? $scope.closest('.elementor-inner-column').data("model-cid") : getColumnID(),
                 editMode = elementorFrontend.isEditMode() && !target.data('general_settings');
 
             if (editMode) {
@@ -285,6 +285,36 @@
                 }
 
                 return false;
+            }
+
+            function getSectionID() {
+
+                var sectionID = null;
+
+                if (elementorFrontend.config.experimentalFeatures.container) {
+                    sectionID = $scope.closest('.e-container--row').data("model-cid");
+                }
+
+                if (!sectionID)
+                    sectionID = $scope.closest('.elementor-top-section').data("model-cid");
+
+                return sectionID;
+
+            }
+
+            function getColumnID() {
+
+                var columnID = null;
+
+                if (elementorFrontend.config.experimentalFeatures.container) {
+                    columnID = $scope.closest('.e-container--column').data("model-cid");
+                }
+
+                if (!columnID)
+                    columnID = $scope.closest('.elementor-top-column').data("model-cid");
+
+                return columnID;
+
             }
 
             /**

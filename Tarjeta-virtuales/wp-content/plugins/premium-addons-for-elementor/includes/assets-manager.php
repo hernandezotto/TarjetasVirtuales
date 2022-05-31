@@ -262,7 +262,7 @@ class Assets_Manager {
 
 		$current_id = get_the_ID();
 
-		if ( ! $current_id ) {
+		if ( ! $current_id || $current_id < 0 ) {
 			return false;
 		}
 

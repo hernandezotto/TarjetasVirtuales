@@ -390,6 +390,27 @@ class UniteCreatorAddonViewChildParams{
 		
 		$arrParams[] = $this->createChildParam_code($key, $text);
 		
+		//----- get current user ------
+
+		$key = "get_current_user()";
+		$text = "
+{# get the current logged in user. If not logged in then return null #}
+
+{% set user = ucfunc(\"get_current_user\") %}
+
+{% if user is empty %}
+		no user loggedin
+{% else %}
+
+  {{user.name}}
+
+{{printVar(user)}}
+
+{% endif %}
+";
+		
+		$arrParams[] = $this->createChildParam_code($key, $text);
+		
 		
 		
 		//----- output ------
@@ -1165,6 +1186,8 @@ function {{uc_id}}_start(){
 		$arrParams[] = $this->createChildParam("alias");
 		$arrParams[] = $this->createChildParam("content", UniteCreatorDialogParam::PARAM_EDITOR);
 		$arrParams[] = $this->createChildParam("content|wpautop", UniteCreatorDialogParam::PARAM_EDITOR);
+		$arrParams[] = $this->createChildParam("put_post_content()",null,array("raw_insert_text"=>"{{ucfunc(\"put_post_content\", [param_prefix].id, [param_prefix].content)}}"));
+		
 		$arrParams[] = $this->createChildParam("intro");
 		$arrParams[] = $this->createChildParam("intro_full",null,array("raw_insert_text"=>"{{[param_name]|truncate(100)}}"));
 		
@@ -1415,7 +1438,7 @@ function {{uc_id}}_start(){
 		
 		$arrParams[] = $this->createAddParam();
 		$arrParams[] = $this->createAddParam("nounit");
-
+	
 		$addParams = array("condition"=>"responsive");
 		
 		$arrParams[] = $this->createAddParam("tablet", $addParams);

@@ -12,6 +12,7 @@ defined('UNLIMITED_ELEMENTS_INC') or die('Restricted access');
 		private static $cacheTermCustomFields = array();
 		private static $cacheTermParents = array();
 		
+		private static $arrTermParentsCache = array();
 		private static $arrTaxCache;
 		private static $arrUrlThumbCache = array();
 		private static $arrUrlAttachmentDataCache = array();
@@ -595,7 +596,7 @@ defined('UNLIMITED_ELEMENTS_INC') or die('Restricted access');
 		public static function getPostSingleTerms($postID, $taxonomyName){
 			
 			$arrTerms = wp_get_post_terms($postID, $taxonomyName);
-			
+						
 			$arrTerms = self::getTermsObjectsData($arrTerms, $taxonomyName);
 			
 			return($arrTerms);
@@ -780,6 +781,163 @@ defined('UNLIMITED_ELEMENTS_INC') or die('Restricted access');
 			}
 			
 		}
+		
+		public static function a_________TAXONOMY_LEVELS___________(){}
+		
+		/**
+		 * filter last level terms only from terms list
+		 */
+		public static function filterTermsLastLevel($arrTerms, $taxonomy){
+			
+			if(empty($arrTerms))
+				return($arrTerms);
+				
+			if(count($arrTerms) == 1)
+				return($arrTerms);
+			
+			//get parents list
+			$arrParents = array();
+			foreach($arrTerms as $term){
+				
+				$parentID = UniteFunctionsUC::getVal($term, "parent_id");
+				
+				$arrParents["term_".$parentID] = true;
+				
+			}
+			
+			//same parent
+			
+			if(count($arrParents) == 1)
+				return($arrTerms);
+			
+			//return not main if main exists, and there is only 2
+			
+			$mainTerm = UniteFunctionsUC::getVal($arrParents, "term_0");
+			
+			if(count($arrParents) == 2 && !empty($mainTerm)){
+				
+				$arrOutput = array();
+				
+				foreach($arrTerms as $term){
+					$parentID = UniteFunctionsUC::getVal($term, "parent_id");
+					
+					if(empty($parentID))
+						continue;
+					
+					$arrOutput[] = $term;
+				}
+				
+				return($arrOutput);
+			}
+			
+			//get by hierarchy
+			
+			$arrTerms = self::addTermsLevels($arrTerms, $taxonomy);
+			
+			//find max level
+			
+			$maxLevel = 0;
+			foreach($arrTerms as $term){
+				
+				$level = UniteFunctionsUC::getVal($term, "level");
+				
+				if($level > $maxLevel)
+					$maxLevel = $level;
+			}
+			
+			
+			//filter by last only
+			$arrOutput = array();
+			
+			foreach($arrTerms as $term){
+				
+				$level = UniteFunctionsUC::getVal($term, "level");
+				
+				if($level == $maxLevel)
+					$arrOutput[] = $term;	
+			}
+			
+			
+			return($arrOutput);
+		}
+		
+		
+		/**
+		 * add levels to terms
+		 */
+		public static function addTermsLevels($arrTerms, $taxonomy){
+			
+			//add level to terms
+			$arrParentIDs = self::getTermsIDsWithParentIDs($taxonomy);
+			
+			foreach($arrTerms as $key=>$term){
+				
+				$termID = UniteFunctionsUC::getVal($term, "term_id");
+				
+				$level = self::getTermLevel($termID, $arrParentIDs);
+				
+				$term["level"] = $level;
+				
+				$arrTerms[$key] = $term;
+			}
+			
+			return($arrTerms);
+		}
+		
+		
+		/**
+		 * get term level
+		 */
+		private static function getTermLevel($termID, $arrParentIDs){
+			
+			$level = 0;
+						
+			do{
+				$termID = UniteFunctionsUC::getVal($arrParentIDs, $termID);
+				
+				$isFound = !empty($termID);
+				
+				if($isFound == true)
+					$level++;
+				
+			}while($isFound);
+			
+			return($level);
+		}
+		
+		
+		/**
+		 * get term hierarchy level
+		 */
+		public static function getTermsIDsWithParentIDs($taxonomy){
+			
+			//get from cache
+			
+			$arrParentsCache = UniteFunctionsUC::getVal(self::$arrTermParentsCache, $taxonomy);
+			
+			if(!empty($arrParentsCache))
+				return($arrParentsCache);
+			
+			$arrHierarchy = _get_term_hierarchy($taxonomy);
+			
+			if(empty($arrHierarchy))
+				return(array());
+				
+			$arrTermIDs = array();
+			
+			foreach($arrHierarchy as $parentID => $arrIDs){
+				
+				foreach($arrIDs as $termID)
+					$arrTermIDs[$termID] = $parentID;				
+			}
+			
+			
+			//add cache
+			self::$arrTermParentsCache[$taxonomy] = $arrTermIDs;
+			
+			return($arrTermIDs);
+		}
+		
 		
 		
 		public static function a_________CATEGORIES_AND_TAGS___________(){}
@@ -1498,7 +1656,7 @@ defined('UNLIMITED_ELEMENTS_INC') or die('Restricted access');
 				
 				$where .= " wp_posts.post_title like '%$titleFilter%'";
 			}
-				
+			
 			
 			return($where);
 		}

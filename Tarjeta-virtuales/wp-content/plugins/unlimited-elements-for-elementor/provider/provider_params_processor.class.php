@@ -957,6 +957,7 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 		$before = "";
 		$year = "";
 		$month = "";
+		$day = "";
 		
 		$afterMeta = null;
 		$beforeMeta = null;
@@ -964,6 +965,45 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 		switch($dateString){
 			case "today":
 				$after = "-1 day";
+				
+			break;
+			case "this_day":
+				
+				if(!empty($metaField)){
+					$afterMeta = date('Ymd');
+					$beforeMeta = date('Ymd');
+				}else{
+					
+					$year = date("Y");
+					$month = date("m");
+					$day = date("d");
+										
+					$arrDateQuery['inclusive'] = true;
+				}
+				
+			break;
+			case "past_from_today":
+				
+				if(!empty($metaField)){
+					$beforeMeta = date('Ymd');					
+				}else{
+					
+					$before = "tomorrow";
+					
+					$arrDateQuery['inclusive'] = true;
+				}
+				
+			break;
+			case "past_from_yesterday":
+				
+				if(!empty($metaField)){
+					$beforeMeta = date('Ymd',strtotime('-1 day'));					
+				}else{
+					
+					$before = "today";
+					
+					$arrDateQuery['inclusive'] = false;
+				}
 				
 			break;
 			case "yesterday":
@@ -1012,7 +1052,6 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 			case "future":
 				
 				if(!empty($metaField)){
-					
 					$afterMeta = date('Ymd');
 				}else{
 					
@@ -1083,6 +1122,9 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 			if(!empty($month))
 				$arrDateQuery["month"] = $month;
 			
+			if(!empty($day))
+				$arrDateQuery["day"] = $day;
+				
 		}
 		
 		
@@ -1437,6 +1479,7 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 		$args["ignore_sticky_posts"] = true;
 		
 		$getOnlySticky = false;
+		$checkStickyPostsByPlugin = false;
 		
 		$product = null;
 		
@@ -1458,6 +1501,10 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 			switch($includeby){
 				case "sticky_posts":
 					$args["ignore_sticky_posts"] = false;
+					
+					if($postType != "post")
+						$checkStickyPostsByPlugin = true;
+					
 				break;
 				case "sticky_posts_only":
 					$getOnlySticky = true;
@@ -1858,7 +1905,7 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 		if($getOnlySticky == true){
 			
 			$arrStickyPosts = get_option("sticky_posts");
-				
+			
 			$args["ignore_sticky_posts"] = true;
 			
 			if(!empty($arrStickyPosts) && is_array($arrStickyPosts)){
@@ -1867,7 +1914,7 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 				$args["post__in"] = array("0");		//no posts at all
 			}
 		}
-				
+		
 		$args = $this->getPostListData_getPostGetFilters_pagination($args, $value, $name, $data, $param);
 				
 		$args = $this->getPostListData_getCustomQueryFilters($args, $value, $name, $data);
@@ -1931,6 +1978,11 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 		if(!$arrPosts)
 			$arrPosts = array();
 		
+		//sticky posts integration
+		if($checkStickyPostsByPlugin == true)
+			$arrPosts = UniteCreatorPluginIntegrations::checkAddStickyPosts($arrPosts, $args);	
+
+
 		//add parent posts
 		
 		if(!empty($addParentType) && !empty($addParentIDs)){
@@ -2769,8 +2821,6 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 		
 		//for posts
 		
-		
-		
 		$arrFilters = array();
 		if(!empty($thumbSize))
 			$arrFilters[] = $thumbSize;
@@ -2788,6 +2838,7 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 		
 		$titleSource = null;
 		$descriptionSource = null;
+		
 		
 		switch($source){
 			case "posts":
@@ -2823,6 +2874,9 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 		
 		$params["title_source"] = $titleSource;
 		$params["description_source"] = $descriptionSource;
+		
+		if(empty($arrItems))
+			$arrItems = array();
 		
 		$output = array();
 		foreach($arrItems as $index => $item){
@@ -2934,6 +2988,7 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 		
 		$metaKey = UniteFunctionsUC::getVal($value, $name."_current_metakey");
 		
+		
 		if(empty($metaKey)){
 			
 			if($isShowMeta == true)
@@ -2943,7 +2998,7 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 		}
 
 		$metaValues = get_post_meta($postID, $metaKey, true);
-		
+				
 		if(empty($metaValues)){
 			
 			if($isShowMeta)
@@ -2953,8 +3008,10 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 		}
 		
 		if(is_array($metaValues))
-			return(false);
+			return($metaValues);
 			
+		//if string - convert to array
+		
 		$arrValues = explode(",", $metaValues);
 		
 		$arrIDs = array();
@@ -3161,6 +3218,8 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 		return($data);
 	}
 	
+	
+	
 	/**
 	 * get listing data
 	 */
@@ -3178,7 +3237,9 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 				
 				return($data);
 			break;
-			case "filter":
+			case "items":
+				
+				$data = $this->getMultisourceSettingsData($value, $name, $processType, $param, $data);
 				
 				return($data);
 			break;
@@ -3237,7 +3298,7 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 			break;
 			case "current_post_meta":		//meta field with image id's
 				
-				$data[$name."_items"] = $this->getGroupedData_getArrImageIDsFromMeta($value, $name);				
+				$data[$name."_items"] = $this->getGroupedData_getArrImageIDsFromMeta($value, $name);
 				
 			break;
 			case "image_video_repeater":
@@ -3265,7 +3326,7 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 					$arrInstagramItems = array();
 				
 				$data[$name."_items"] = $arrInstagramItems;
-								
+							
 			break;
 			default:
 				UniteFunctionsUC::throwError("Wrong dynamic content source: $source");
@@ -3275,7 +3336,7 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 		if($isForGallery == true){
 			
 			$arrItems = $data[$name."_items"];
-						
+			
 			$data[$name."_items"] = $this->getGroupedData_convertForGallery($arrItems, $source, $value, $param);
 			
 			
@@ -3324,6 +3385,92 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 		return($data);
 	}
 	
+	protected function z_______________MULTISOURCE____________(){}
+	
+	/**
+	 * get all fields from the values
+	 */
+	private function modifyMultisourceItems_getFields($arrValues, $namePosts){
+		
+		
+		$arrFields = array();
+		
+		foreach($arrValues as $key => $value){
+			
+			$prefix = $namePosts."_field_source_";
+			
+			$pos = strpos($key, $prefix);
+			
+			if($pos === false)
+				continue;
+			
+			$arrFields[$key] = $value;
+		}
+		
+		return($arrFields);
+	}
+	
+	
+	/**
+	 * modify multisource posts items
+	 */
+	private function modifyMultisourceItems_posts($arrPosts, $namePosts, $arrValues){
+		
+		$arrFields = $this->modifyMultisourceItems_getFields($arrValues, $namePosts);
+		
+		dmp("modify multisource posts items");
+		
+		dmp($arrFields);
+				
+		dmp($namePosts);
+		
+		
+		UniteFunctionsUC::throwError("multisource - posts not ready yet :(");
+		
+		return($arrPosts);
+	}
+	
+	
+	/**
+	 * get multisource data
+	 */
+	private function getMultisourceSettingsData($value, $name, $processType, $param, $data){
+		
+		$itemsSource = UniteFunctionsUC::getVal($value, $name."_source");
+		
+		$response = null;
+		
+		switch($itemsSource){
+			case "items":
+				
+				$response = "uc_items";
+				
+			break;
+			case "posts":
+				
+				$paramPosts = $param;
+				$namePosts = $name."_post";
+				
+				$paramPosts["name"] = $namePosts;
+				$paramPosts["name_listing"] = $name;
+				$paramPosts["use_for_listing"] = true;
+				
+				$dataResponse = $this->getPostListData($value, $paramPosts["name"], $processType, $paramPosts, $data);
+				
+				$arrPosts = UniteFunctionsUC::getVal($dataResponse, $name."_items");
+				
+				$response = $this->modifyMultisourceItems_posts($arrPosts, $namePosts, $value);
+								
+			break;
+			default:
+				UniteFunctionsUC::throwError("Wrong multisource source: $itemsSource");
+			break;
+		}
+		
+		$data[$name] = $response;
+		
+		return($data);
+	}
 	
 	
 	protected function z_______________TERMS____________(){}
@@ -4121,6 +4268,7 @@ class UniteCreatorParamsProcessor extends UniteCreatorParamsProcessorWork{
 	        case UniteCreatorDialogParam::PARAM_CONTENT:
 	        case UniteCreatorDialogParam::PARAM_BACKGROUND:
 	        case UniteCreatorDialogParam::PARAM_MENU:
+	        case UniteCreatorDialogParam::PARAM_SPECIAL:
 	        case UniteCreatorDialogParam::PARAM_INSTAGRAM:
 	        case UniteCreatorDialogParam::PARAM_TEMPLATE:
 	            

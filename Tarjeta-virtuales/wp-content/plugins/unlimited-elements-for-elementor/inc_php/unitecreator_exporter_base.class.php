@@ -70,6 +70,7 @@ class UniteCreatorExporterBase extends UniteElementsBaseUC{
 		//create import folder
 		$this->pathImport = $pathCache."import/";
 		UniteFunctionsUC::mkdirValidate($this->pathImport, "import");
+			
 		
 		//create index.html
 		UniteFunctionsUC::writeFile("", $this->pathImport."index.html");

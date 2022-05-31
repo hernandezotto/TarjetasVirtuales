@@ -15,34 +15,37 @@ class UniteCreatorElementorControls{
 	 * get repeater default items
 	 */
 	private function getRepeaterDefaultItems($objAddon){
-		
-    	$arrSourceItems = $objAddon->getArrItemsNonProcessed();
-		
-    	if(empty($arrSourceItems))
-    		return(array());
     	
-    	$urlAssets = $objAddon->getUrlAssets();
+		$arrItems = array();
+		
+		$urlImages = GlobalsUC::$urlPluginImages;
+		
+		$arrItems[] = array("item_type"=>"image",
+							"image"=> array("id"=>0,"url"=>$urlImages."gallery1.jpg") );
+		
+		$arrItems[] = array("item_type"=>"image",
+							"image"=> array("id"=>0,"url"=>$urlImages."gallery2.jpg") );
+		
+		$arrItems[] = array("item_type"=>"youtube",
+							"image"=> array("id"=>0,"url"=>$urlImages."gallery3.jpg"),
+							"url_youtube"=>"qrO4YZeyl0I"
+		);
+		
+		$arrItems[] = array("item_type"=>"image",
+							"image"=> array("id"=>0,"url"=>$urlImages."gallery5.jpg") );
+		
+		$arrItems[] = array("item_type"=>"vimeo",
+							"image"=> array("id"=>0,"url"=>$urlImages."gallery4.jpg"),
+							"vimeo_id"=>"581014653");
+		
+		$arrItems[] = array("item_type"=>"html5",
+							"image"=> array("id"=>0,"url"=>$urlImages."gallery6.jpg"),
+							"url_html5"=> "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4");
+		
+		$arrItems[] = array("item_type"=>"image",
+							"image"=> array("id"=>0,"url"=>$urlImages."gallery1.jpg") );
+		
     	    	
-    	$arrItems = array();
-    	
-    	foreach($arrSourceItems as $item){
-    		
-    		$urlImage = UniteFunctionsUC::getVal($item, "image");
-    		$title = UniteFunctionsUC::getVal($item, "title");
-    		
-    		if(empty($urlImage))
-    			continue;
-    		
-    		if(!empty($urlAssets))
-    			$urlImage = HelperUC::convertFromUrlAssets($urlImage, $urlAssets);
-    		
-    		$outputItem = array();
-    		$outputItem["image"] = array("url"=>$urlImage);
-    		$outputItem["title"] = $title;
-    		
-    		$arrItems[] = $outputItem;
-    	}
-    	
     	return($arrItems);
 	}
 
@@ -55,7 +58,7 @@ class UniteCreatorElementorControls{
 		$isEnableVideo = UniteFunctionsUC::getVal($listingParam, "gallery_enable_video");
 		
 		$arrDefaultItems = $this->getRepeaterDefaultItems($objAddon);
-				
+		
 		$repeater = new Repeater();
 		
 	        $objControls->start_controls_section(
@@ -93,7 +96,7 @@ class UniteCreatorElementorControls{
 				array(
 					'label' => __( 'Youtube Url or ID', 'unlimited-elements-for-elementor' ),
 					'type' => Controls_Manager::TEXT,
-					'default' => __( '', 'unlimited-elements-for-elementor' ),
+					'default' => __( 'qrO4YZeyl0I', 'unlimited-elements-for-elementor' ),
 					'description'=>'For example: https://www.youtube.com/watch?v=qrO4YZeyl0I or qrO4YZeyl0I',
 					'separator'=>'before',
 					'label_block'=>true,
@@ -108,7 +111,7 @@ class UniteCreatorElementorControls{
 				array(
 					'label' => __( 'Vimeo Video ID or Url', 'unlimited-elements-for-elementor' ),
 					'type' => Controls_Manager::TEXT,
-					'default' => __( '', 'unlimited-elements-for-elementor' ),
+					'default' => __( '581014653', 'unlimited-elements-for-elementor' ),
 					'description'=>__('For example: 581014653, or https://vimeo.com/581014653','unlimited-elements-for-elementor'),
 					'separator'=>'before',
 					'label_block'=>true,
@@ -123,7 +126,7 @@ class UniteCreatorElementorControls{
 				array(
 					'label' => __( 'Wistia Video ID', 'unlimited-elements-for-elementor' ),
 					'type' => Controls_Manager::TEXT,
-					'default' => __( '', 'unlimited-elements-for-elementor' ),
+					'default' => __( '9oedgxuciv', 'unlimited-elements-for-elementor' ),
 					'description'=>__('For example: 9oedgxuciv','unlimited-elements-for-elementor'),
 					'separator'=>'before',
 					'label_block'=>true,
@@ -138,7 +141,7 @@ class UniteCreatorElementorControls{
 				array(
 					'label' => __( 'MP4 Video Url', 'unlimited-elements-for-elementor' ),
 					'type' => Controls_Manager::TEXT,
-					'default' => __( '', 'unlimited-elements-for-elementor' ),
+					'default' => __( 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', 'unlimited-elements-for-elementor' ),
 					'description'=>__('Enter url of the mp4 video in current or external site. Example: http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4','unlimited-elements-for-elementor'),
 					'separator'=>'before',
 					'label_block'=>true,
@@ -225,7 +228,7 @@ class UniteCreatorElementorControls{
 			);
 			
 			
-			
+					
 			$objControls->add_control(
 				$name.'_items',
 				array(

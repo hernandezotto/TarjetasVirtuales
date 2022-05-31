@@ -165,7 +165,7 @@ function perfect_portfolio_content_start(){
                 <?php        
                     if ( is_home() ) : 
                         echo '<h1 class="page-title">';
-                        esc_html_e( 'Blog','perfect-portfolio' );
+                        esc_html( single_post_title() );
                         echo '</h1>';
                         $blog_description = get_theme_mod( 'blog_description', '' );
                         if( ! empty( $blog_description ) ) :

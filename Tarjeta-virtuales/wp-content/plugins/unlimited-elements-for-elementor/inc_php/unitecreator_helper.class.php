@@ -284,15 +284,16 @@ defined('UNLIMITED_ELEMENTS_INC') or die('Restricted access');
 		}
 		
 		/**
-		 * return true / false if the value already appeared
+		 * return true - need to run. 
 		 * used for run code once functionality
 		 */
 		public static function isRunCodeOnce($key){
 			
 			$isAlreadyRun = UniteFunctionsUC::getVal(self::$arrRunOnceCache, $key);
 			
-			if($isAlreadyRun === true)
+			if($isAlreadyRun === true){
 				return(false);
+			}
 			
 			self::$arrRunOnceCache[$key] = true;
 			
@@ -932,6 +933,7 @@ defined('UNLIMITED_ELEMENTS_INC') or die('Restricted access');
 			
 			return($filepath);
 		}
+		
 		
 		/**
 		 * get url content

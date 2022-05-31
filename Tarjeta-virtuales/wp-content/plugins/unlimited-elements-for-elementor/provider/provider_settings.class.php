@@ -1205,11 +1205,13 @@ class UniteCreatorSettings extends UniteCreatorSettingsWork{
 		
 		$arrIncludeBy = array();
 		
-		if($isForWooProducts == false){
+		$isStickyPluginExists = UniteCreatorPluginIntegrations::isStickySwitchPluginEnabled();
+		
+		if($isForWooProducts == false || $isStickyPluginExists == true){
 			$arrIncludeBy["sticky_posts"] = __("Include Sticky Posts", "unlimited-elements-for-elementor");
 			$arrIncludeBy["sticky_posts_only"] = __("Get Only Sticky Posts", "unlimited-elements-for-elementor");			
 		}
-		
+				
 		$arrIncludeBy["author"] = __("Author", "unlimited-elements-for-elementor");
 		$arrIncludeBy["date"] = __("Date", "unlimited-elements-for-elementor");
 		

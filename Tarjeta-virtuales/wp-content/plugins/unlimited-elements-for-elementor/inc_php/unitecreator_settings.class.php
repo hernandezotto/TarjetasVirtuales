@@ -34,7 +34,7 @@ class UniteCreatorSettingsWork extends UniteSettingsAdvancedUC{
 	 * the type should be given as "origtype" attribute
 	 */
 	public function getSettingsCreatorFormat(){
-				
+		
 		$arrParams = array();
 		foreach($this->arrSettings as $setting){
 			
@@ -52,6 +52,9 @@ class UniteCreatorSettingsWork extends UniteSettingsAdvancedUC{
 			$param["description"] = UniteFunctionsUC::getVal($setting, "description");
 			$param["default_value"] = UniteFunctionsUC::getVal($setting, "default_value");
 			$param["placeholder"] = UniteFunctionsUC::getVal($setting, "placeholder");
+			$param["min"] = UniteFunctionsUC::getVal($setting, "min");
+			$param["max"] = UniteFunctionsUC::getVal($setting, "max");
+			$param["step"] = UniteFunctionsUC::getVal($setting, "step");
 			
 			if(!empty($function))
 				$param["function"] = $function;
@@ -134,7 +137,7 @@ class UniteCreatorSettingsWork extends UniteSettingsAdvancedUC{
 		$this->addByCreatorParam($param);
     	
 		$arrParams = $this->getSettingsCreatorFormat();
-		
+				
 		return($arrParams);
 	}
 	
@@ -496,6 +499,7 @@ class UniteCreatorSettingsWork extends UniteSettingsAdvancedUC{
 			case UniteCreatorDialogParam::PARAM_TEMPLATE:
 			case "uc_filters_repeater_params":
 			case UniteCreatorDialogParam::PARAM_LISTING:
+			case UniteCreatorDialogParam::PARAM_SPECIAL:
 				
 				return(true);
 			break;
@@ -551,11 +555,32 @@ class UniteCreatorSettingsWork extends UniteSettingsAdvancedUC{
 		return($options);
 	}
 	
+	
+	/**
+	 * add special param
+	 */
+	private function addSpecialParam($name, $param){
+		
+		$attributeType = UniteFunctionsUC::getVal($param, "attribute_type");
+		
+		switch($attributeType){
+			case "entrance_animation":
+				
+				UniteCreatorEntranceAnimations::addSettings($this, $name, $param);
+				
+			break;
+			default:
+				UniteFunctionsUC::throwError("Add special param error: wrong attribute type: $attributeType");
+			break;
+		}
+				
+	}
+	
 	/**
 	 * add setting by creator param
 	 */
 	public function addByCreatorParam($param, $inputValue = null){
-				
+		
 		//add ready setting if exists
 		$arrReadySetting = UniteFunctionsUC::getVal($param, "uc_setting"); 
 		if(!empty($arrReadySetting)){
@@ -868,16 +893,16 @@ class UniteCreatorSettingsWork extends UniteSettingsAdvancedUC{
 				
 			break;
 			case UniteCreatorDialogParam::PARAM_SPECIAL:
-
-				$this->addVisibleInElementorOnlySetting("Special Attribute");
 				
+				$this->addSpecialParam($name, $param);
+								
 			break;
 			case UniteCreatorDialogParam::PARAM_DATETIME:
 				
 				$extra["placeholder"] = "YYYY-mm-dd HH:ii";
 				
 				$this->addTextBox($name, $value, $title, $extra);
-								
+				
 			break;
 			default:
 				
@@ -978,7 +1003,7 @@ class UniteCreatorSettingsWork extends UniteSettingsAdvancedUC{
 	 * add settings by creator params
 	 */
 	public function initByCreatorParams($arrParams){
-		
+				
 		foreach($arrParams as $param){
 			$this->addByCreatorParam($param);
 		}

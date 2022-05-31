@@ -1032,6 +1032,7 @@ html.premium-woo-qv-opened body {
 #premium-woo-quick-view-modal .premium-woo-qv-image-slider img {
     -o-object-fit: cover;
     object-fit: cover;
+    width: 100%;
 }
 
 #premium-woo-quick-view-content div.images {

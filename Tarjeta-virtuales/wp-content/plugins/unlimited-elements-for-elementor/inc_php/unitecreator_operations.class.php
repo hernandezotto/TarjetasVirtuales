@@ -485,6 +485,64 @@ defined('UNLIMITED_ELEMENTS_INC') or die('Restricted access');
 			
 		}
 		
+		/**
+		 * get the cats
+		 */
+		private function getPostsFromTwig_getCats($strCats){
+			
+			if(empty($strCats))
+				return(false);
+
+			//get taxonomy
+			
+			$taxnonomy = "post";
+			
+			$arrData = explode("|", $strCats);
+			
+			if(count($arrData) == 2){
+				
+				$taxnonomy = $arrData[0];
+				
+				$strCats = $arrData[1];
+			}
+			
+			$arrCats = explode(",", $strCats);
+			
+			$taxQuery = array();
+			
+			foreach($arrCats as $cat){
+				
+				$item = array();
+				$item["taxonomy"] = $taxnonomy;
+				$item["field"] = "name";
+				$item["terms"] = $arrCats;
+				
+				$taxQuery[] = $item;
+				$taxQuery["relation"] = "or";
+			}
+			
+			return($taxQuery);
+		}
+		
+		
+		/**
+		 * get posts from twig
+		 * simple function
+		 */
+		public function getPostsFromTwig($postType, $strCats, $strArgs){
+			
+			if(empty($postType))
+				$postType = "post";
+			
+			$arrCats = $this->getPostsFromTwig_getCats($strCats);
+			
+			dmp("get posts");
+			
+			dmp($arrCats);
+			
+			
+			
+		}
 		
 		private function a____________DATE____________(){}
 		

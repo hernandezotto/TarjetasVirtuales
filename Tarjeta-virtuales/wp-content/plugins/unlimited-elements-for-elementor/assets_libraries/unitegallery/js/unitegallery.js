@@ -1,4 +1,4 @@
-//Unite Gallery, Version: 1.7.58, released 24 April 2022
+//Unite Gallery, Version: 1.7.59, released 26 May 2022
 
 //------ ug-common-libraries.js------ 
 
@@ -2625,6 +2625,9 @@ function UGFunctions(){
 	 * strip tags from string
 	 */
 	this.stripTags = function(html){
+		
+		if(typeof html != "string")
+			return(html);
 		
 		var text = html.replace(/(<([^>]+)>)/ig,"");
 		
@@ -18580,8 +18583,8 @@ function UGHtml5MediaAPI(){
 		if(data.posterImage)
 			htmlPoster = "poster='"+data.posterImage+"'";
 		
-		var html = "<video id='"+htmlID+"' width='"+width+"' height='"+height+"'  controls='controls' preload='none' "+htmlAutoplay+" "+htmlPoster+">";
-				
+		var html = "<video id='"+htmlID+"' width='"+width+"' height='"+height+"'  controls='controls' controlsList='nodownload' preload='none' "+htmlAutoplay+" "+htmlPoster+">";
+		
 		if(data.mp4 != "")
 			html += "<source type='video/mp4' src='"+data.mp4+"' />";
 		
@@ -18599,6 +18602,12 @@ function UGHtml5MediaAPI(){
 		html += "</video>";
 		
 		jQuery("#"+divID).html(html);
+		
+		var objVideo = jQuery("#"+htmlID);
+		
+		objVideo.on("contextmenu",function(){
+			return(false);
+		});
 		
 		new MediaElement(htmlID, {			
 		    enablePluginDebug: false,

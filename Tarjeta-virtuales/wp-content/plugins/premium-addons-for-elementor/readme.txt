@@ -3,9 +3,9 @@ Contributors: Leap13, Rimoun
 Tags: elementor, elementor addons, elementor widgets, elementor elements, elementor templates
 Donate Link: https://premiumaddons.com/?utm_source=wp-repo&utm_medium=link&utm_campaign=readme
 Requires at least: 5.0
-Tested Up To: 5.9.3
+Tested Up To: 6.0
 Requires PHP: 5.4
-Stable Tag: 4.9.14
+Stable Tag: 4.9.15
 License: GPL v3.0
 License URI: https://opensource.org/licenses/GPL-3.0
 
@@ -19,6 +19,9 @@ Supercharge your [Elementor Page Builder](https://wordpress.org/plugins/elemento
 
 ### Useful Links
 [Support](https://my.leap13.com/contact-support/) | [Docs](https://premiumaddons.com/docs/?utm_source=wp-repo&utm_medium=link&utm_campaign=readme) | [Video Tutorials](https://www.youtube.com/channel/UCXcJ9BeO2sKKHor7Q9VglTQ) | [Facebook Group](https://facebook.com/groups/premiumAddons) | [Upgrade to Pro](https://premiumaddons.com/pro/?utm_source=wp-repo&utm_medium=link&utm_campaign=readme)
+
+### New: Three transition effects added to Premium Vertical Scroll one page navigation widget
+Now, you can select between three scroll transition effects in Elementor one page navigation widget in Premium Addons. Make your Vertical Scroll Elementor widget glow using the newly transitions Cube, Parallax, and Zoomed Parallax. Those three new transitions will let you get the ability to build eye-catchy single page WordPress websites with no effort. [Check it out now!](https://premiumaddons.com/vertical-scroll-widget-for-elementor-page-builder/?utm_source=wp-repo&utm_medium=link&utm_campaign=readme).
 
 ### New: Elementor Navigation/Mega Menu Widget
 Now, you build outstanding navigation menus and mega menus in Elementor using Premium Navigation/Mega Menu Widget which allows you to select between four different layouts with dozens of options to create a responsive menu for your Elementor website. [Check it out now!](https://premiumaddons.com/elementor-mega-menu-widget/?utm_source=wp-repo&utm_medium=link&utm_campaign=readme).
@@ -211,6 +214,13 @@ Premium Addons for Elementor is 100% Ads Free, Ads can only be detected from You
 14. Premium Progress Bar Widget for Elementor
 
 == Changelog ==
+
+= 4.9.15 =
+
+- New: Added Cube, Parallax, and Zoomed Parallax transition effects in Vertical Scroll widget - [here](https://premiumaddons.com/vertical-scroll-widget-for-elementor-page-builder/).
+- Fixed: Mega Menu automatically closes when a link is clicked in sub menus.
+- Fixed: Floating Effects addon not working with Elementor Flex Container element.
+- Fixed: PHP Fatal error in Dynamic Assets Generate feature.
 
 = 4.9.14 =
 

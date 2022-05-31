@@ -12,13 +12,14 @@ if(!defined('UNLIMITED_ELEMENTS_INC'))
 defined('UNLIMITED_ELEMENTS_INC') or die('Restricted access');
 
 if(!defined("UNLIMITED_ELEMENTS_VERSION"))
-	define("UNLIMITED_ELEMENTS_VERSION", "1.5.12");
+	define("UNLIMITED_ELEMENTS_VERSION", "1.5.15");
 
 $currentFile = __FILE__;
 $currentFolder = dirname($currentFile);
 $folderIncludesMain = $currentFolder."/inc_php/";
 
 $filepathFramework = $folderIncludesMain . 'framework/include_framework.php';
+
 
 
 if(file_exists($filepathFramework) == false)
@@ -88,8 +89,8 @@ require_once $folderIncludesMain . 'unitecreator_addon_validator.class.php';
 require_once $folderIncludesMain . 'unitecreator_filters_process.class.php';
 require_once $folderIncludesMain . 'unitecreator_unitegallery.class.php';
 require_once GlobalsUC::$pathProvider . 'integrations.class.php';
+require_once $folderIncludesMain . 'unitecreator_entrance_animations.class.php';
 
-//page builder related
 
 require_once $folderIncludesMain . 'manager/unitecreator_manager.class.php';
 require_once $folderIncludesMain . 'manager/unitecreator_manager_addons.class.php';

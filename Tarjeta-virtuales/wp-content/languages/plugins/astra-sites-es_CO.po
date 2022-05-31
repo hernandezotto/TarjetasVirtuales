@@ -2,14 +2,18 @@
 # This file is distributed under the same license as the Plugins - Starter Templates — Elementor, WordPress &amp; Beaver Builder Templates - Stable (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2022-04-13 05:49:59+0000\n"
+"PO-Revision-Date: 2022-05-20 03:29:36+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: GlotPress/3.0.0\n"
+"X-Generator: GlotPress/4.0.0-alpha.1\n"
 "Language: es_CO\n"
 "Project-Id-Version: Plugins - Starter Templates — Elementor, WordPress &amp; Beaver Builder Templates - Stable (latest release)\n"
+
+#: inc/lib/gutenberg-templates/classes/class-ast-block-templates.php:403
+msgid "Template Kits"
+msgstr "Kits de plantillas"
 
 #. translators: %d is the Template ID.
 #: inc/classes/class-astra-sites.php:366
@@ -1151,7 +1155,6 @@ msgstr "https://wpastra.com/"
 
 #. Plugin Name of the plugin
 #: astra-sites.php:18 astra-sites.php:77
-#: inc/lib/gutenberg-templates/classes/class-ast-block-templates.php:403
 #: inc/lib/onboarding/class-onboarding-loader.php:72
 #: inc/lib/onboarding/assets/dist/main.js:1
 #: inc/lib/onboarding/assets/src/components/logo/index.js:17

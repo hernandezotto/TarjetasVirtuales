@@ -1,5 +1,5 @@
 /**
-* Owl Carousel v2.3.6 - UE5
+* Owl Carousel v2.3.7 - UE6
 * Copyright 2013-2018 David Deutsch
 * Licensed under: SEE LICENSE IN https://github.com/OwlCarousel2/OwlCarousel2/blob/master/LICENSE
 */
@@ -16,6 +16,29 @@
 * @todo stagePadding calculate wrong active classes
 */
 ;(function($, window, document, undefined) {
+	
+	//console log some text
+	if(typeof trace == "undefined"){
+		function trace(str){
+			console.log(str);
+		}
+	}
+	
+	//set the debug output
+	var g_debug = false;
+	
+	
+	/**
+	 * debug function
+	 */
+	function debug(str){
+		
+		if(g_debug == false)
+			return(false);
+		
+		trace(str);
+	}
+	
 	
 	/**
 	* Creates a carousel.
@@ -146,6 +169,37 @@
 		};
 		
 		/**
+		 * get item width
+		 */
+		this.getItemWidth = function(){
+			
+			//caclulate item width
+			switch(this.settings.paddingType){
+				case "left":
+				case "right":
+					var width = (this.width() / this.settings.items).toFixed(3) - this.settings.margin;
+				break;
+					
+				break;
+				case "both":
+					var width = (this.width() / this.settings.items).toFixed(3) - this.settings.margin;
+				break;
+				default:	//no stage padding
+					var width = (this.width() / this.settings.items).toFixed(3) - this.settings.margin;
+				break;
+			}
+			
+			
+			if(this.settings.item_size_gap)
+				width += this.settings.item_size_gap;
+			
+			
+			
+			return(width);
+		}
+		
+		
+		/**
 		* Current state information and their tags.
 		* @type {Object}
 		* @protected
@@ -235,7 +289,8 @@
 		stageClass: 'owl-stage',
 		stageOuterClass: 'owl-stage-outer',
 		grabClass: 'owl-grab',
-        shuffle: false
+		shuffle: false,
+		item_size_gap:0		//size gap that should fix the 1px bug
 	};
 	
 	/**
@@ -272,8 +327,10 @@
 	*/
 	Owl.Workers = [ {
 		filter: [ 'width', 'settings' ],
-		run: function() {
+		run: function() {		//set total width
 			this._width = this.$element.width();
+			
+			debug("set total width this._width: "+this._width);
 		}
 	}, {
 		filter: [ 'width', 'items', 'settings' ],
@@ -304,7 +361,47 @@
 	}, {
 		filter: [ 'width', 'items', 'settings' ],
 		run: function(cache) {
-			var width = (this.width() / this.settings.items).toFixed(3) - this.settings.margin,
+			
+			debug("run!");
+			
+			//set 1px gap
+			if(this.settings.items == 1){
+				
+				this.settings.item_size_gap = 1;
+				
+				debug("set items size gap: 1");
+			}
+						
+			debug("settings - stage padding type: "+this.settings.paddingType);
+			debug("settings - stage padding: "+this.settings.stagePadding);
+			
+			if( (!this.settings.paddingType || this.settings.paddingType == "none") && this.settings.stagePadding){
+				this.settings.paddingType = "both";
+				
+				debug("set stage padding type - both");
+			}
+			
+			var width = this.getItemWidth();
+			
+			debug("Item width: " + width);
+			
+			//update the stage padding to half of the item width
+			
+			if(this.settings.stagePadding > width){
+				
+				this.settings.stagePadding = 0;
+				
+				var newWidth = this.getItemWidth();
+				
+				this.settings.stagePadding = Math.floor(newWidth*0.5);
+				
+				var width = this.getItemWidth();
+				
+				debug("set new stagePadding: "+this.settings.stagePadding+" and item width: "+width);
+				
+			}
+			
+		
 			merge = null,
 			iterator = this._items.length,
 			grid = !this.settings.autoWidth,
@@ -315,6 +412,7 @@
 				width: width
 			};
 			
+			
 			while (iterator--) {
 				merge = this._mergers[iterator];
 				merge = this.settings.mergeFit && Math.min(merge, this.settings.items) || merge;
@@ -322,9 +420,11 @@
 				cache.items.merge = merge > 1 || cache.items.merge;
 				
 				widths[iterator] = !grid ? this._items[iterator].width() : width * merge;
+				
 			}
 			
 			this._widths = widths;
+			
 		}
 	}, {
 		filter: [ 'items', 'settings' ],
@@ -356,7 +456,7 @@
 			$(prepend).addClass('cloned').prependTo(this.$stage);
 		}
 	}, {
-		filter: [ 'width', 'items', 'settings' ],
+		filter: [ 'width', 'items', 'settings' ],		//set coordinates
 		run: function() {
 			var rtl = this.settings.rtl ? 1 : -1,
 			size = this._clones.length + this._items.length,
@@ -364,22 +464,45 @@
 			previous = 0,
 			current = 0,
 			coordinates = [];
-			
+						
 			while (++iterator < size) {
 				previous = coordinates[iterator - 1] || 0;
 				current = this._widths[this.relative(iterator)] + this.settings.margin;
-				coordinates.push(previous + current * rtl);
+				
+				var coordinate = previous + current * rtl;
+																
+				coordinates.push(coordinate);
 			}
+			
+			//fix the 1px bug
+			if(this.settings.item_size_gap){
+				
+				for(var index in coordinates){
+					coordinates[index] -= this.settings.item_size_gap;
+				}
+				
+			}
+			
+			debug("Set coordinates");
+			debug(coordinates);
+			
 			
 			this._coordinates = coordinates;
 		}
 	}, {
 		filter: [ 'width', 'items', 'settings' ],
-		run: function() {
-			var padding = this.settings.stagePadding,
-			coordinates = this._coordinates,
+		run: function() {		//set the stage widths
 			
-			none = {
+			var padding = this.settings.stagePadding,
+			coordinates = this._coordinates;
+			
+			var paddingType = this.settings.paddingType;
+			var parentOuterStage = 	this.$stage.parent();
+			var parentOuterStageWidth = parentOuterStage.width();
+						
+			//set stage css
+			
+			var none = {
 				'width': Math.ceil(Math.abs(coordinates[coordinates.length - 1])),
 				'padding-left': '',
 				'padding-right': ''
@@ -398,21 +521,62 @@
 				'width': Math.ceil(Math.abs(coordinates[coordinates.length - 1])) + padding,
 				'padding-left': '',
 				'padding-right': padding || ''
-			};
-
-			var paddingType = this.settings.paddingType;
+			};	
 			
-			if(!paddingType)
-				paddingType = "none";
+			//old way with transform
+			
+			/*
+			bothOuter = {
+				'width': parentOuterStageWidth + padding * 2,
+				'transform': 'translate(-' + padding + 'px, 0)',
+			},
+			noneOuter = {
+				'width': '',
+				'transform': 'translate(0, 0)',
+			},			
+			leftOuter = {
+				'width': parentOuterStageWidth + padding,
+				'transform': 'translate(-' + padding + 'px, 0)',
+			},
+			rightOuter = {
+				'width': parentOuterStageWidth + padding,
+				'transform': 'translate(0, 0)',
+			};
+			*/
+			
+			var cssOuter = {
+					width: parentOuterStageWidth
+			};
+			
+			debug("set outer stage css");
+			debug(cssOuter);
 			
 			if(paddingType == 'none'){
+				
 				this.$stage.css(none);
+				parentOuterStage.width(cssOuter);
+				
 			}else if(paddingType == 'both'){
 				this.$stage.css(both);
+				parentOuterStage.css(cssOuter);
+				
+				debug("Set stage width css (both)");
+				debug(both);
+				
 			}else if(paddingType == 'left'){
 				this.$stage.css(left);
+				parentOuterStage.css(cssOuter);
+				
+				debug("Set stage width css (left)");
+				debug(left);
+				
 			}else if(paddingType == 'right'){
 				this.$stage.css(right);
+				parentOuterStage.css(cssOuter);
+				
+				debug("Set stage width css (right)");
+				debug(right);
+								
 			}
 			
 		}
@@ -458,7 +622,7 @@
 			begin = this.coordinates(this.current()) + padding,
 			end = begin + this.width() * rtl,
 			inner, outer, matches = [], i, n;
-
+			
 			if(this.settings.paddingType == 'left' || this.settings.paddingType == 'right'){
 				padding = this.settings.stagePadding;
 			}
@@ -488,7 +652,7 @@
 			if(!this.settings.setActiveClass){
 				return;
 			}
-
+			
 			if (this.settings.setActiveClass) {
 				var $setClass = true;
 				
@@ -568,7 +732,7 @@
 			// invalidate width
 			this.invalidate('width');
 		}
-
+		
 		
 		this.$element
 		.removeClass(this.options.loadingClass)
@@ -584,7 +748,7 @@
 		this.trigger('initialize');
 		
 		this.$element.toggleClass(this.settings.rtlClass, this.settings.rtl);
-
+		
 		
 		if(this.settings.shuffle){
 			var carousel = this.$element;
@@ -728,19 +892,47 @@
 	* @returns {Number} - The width of the view in pixel.
 	*/
 	Owl.prototype.width = function(dimension) {
-		dimension = dimension || Owl.Width.Default;
+		
+		dimension = dimension || Owl.Width.Default;		
+		
+		var calcWidth;
+			
 		switch (dimension) {
 			case Owl.Width.Inner:
 			case Owl.Width.Outer:
-			return this._width;
+				calcWidth = this._width;
+				
+				trace("calc width for dimention: "+dimension);
+				
 			default:
-			if(this.settings.paddingType == 'left' || this.settings.paddingType == 'right'){
-				return this._width - this.settings.stagePadding + this.settings.margin;
-			}else{
-				return this._width - this.settings.stagePadding * 2 + this.settings.margin;
+				
+			switch(this.settings.paddingType){
+				case "left":
+				case "right":
+					debug("calc width with stagePadding: "+this.settings.paddingType);
+					
+					calcWidth = this._width - this.settings.stagePadding + this.settings.margin;
+					
+				break;
+				case "both":
+					debug("calc width with stagePadding: "+this.settings.paddingType);
+					
+					calcWidth = this._width - this.settings.stagePadding*2 + this.settings.margin;
+				break;
+				default:
+					
+					calcWidth = this._width + this.settings.margin;
+					
+					debug("calc width without stagePadding for dimention: "+dimension);
+					
+				break;
 			}
-			
+				
 		}
+		
+		debug("carousel width (no stagepadding and margins): "+calcWidth);
+		
+		return(calcWidth);
 	};
 	
 	/**
@@ -779,6 +971,7 @@
 	* @protected
 	*/
 	Owl.prototype.onResize = function() {
+		
 		if (!this._items.length) {
 			return false;
 		}
@@ -1028,9 +1221,14 @@
 			this.trigger('translate');
 		}
 		
-		if ($.support.transform3d && $.support.transition) {
+		if ($.support.transition) {
+			
+			var tranformValue = coordinate;
+			
+			debug("Go to coordinate: "+coordinate);
+			
 			this.$stage.css({
-				transform: 'translate3d(' + (coordinate-1) + 'px,0px,0px)', // this line is modified (added '-1') in order to fix "one pixel problem"
+				transform: 'translateX(' + (coordinate) + 'px)', 
 				transition: (this.speed() / 1000) + 's' + (
 					this.settings.slideTransition ? ' ' + this.settings.slideTransition : ''
 					)
@@ -1297,7 +1495,7 @@
 			} else {
 				coordinate = this._coordinates[newPosition] || 0;
 			}
-			
+						
 			coordinate = Math.ceil(coordinate);
 			
 			return coordinate;

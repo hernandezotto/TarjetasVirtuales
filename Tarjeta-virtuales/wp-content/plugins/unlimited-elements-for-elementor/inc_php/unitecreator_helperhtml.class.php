@@ -1081,7 +1081,7 @@ defined('UNLIMITED_ELEMENTS_INC') or die('Restricted access');
 				$strCSS .= "#{$id}";
 			}
 			
-			$strCSS.= "{display:none};";
+			$strCSS.= "{display:none}";
 			
 			echo "\n".$strCSS;
 		}
@@ -1116,6 +1116,39 @@ defined('UNLIMITED_ELEMENTS_INC') or die('Restricted access');
 <?php 			
 		}
 		
+		/**
+		 * put function - isElementInViewport
+		 */
+		public static function putJSFunc_isElementInViewport($checkRunOnce = true){
+			
+			if($checkRunOnce == true){
+				
+				$isRunOnce = HelperUC::isRunCodeOnce("js_isElementInViewport");
+				
+				if($isRunOnce == false)
+					return(false);
+			
+			}
+			
+			?>
+	/**
+	 * is element in viewport
+	 */
+    function ueIsElementInViewport(objElement) {
+
+      var elementTop = objElement.offset().top;
+      var elementBottom = elementTop + objElement.outerHeight();
+
+      var viewportTop = jQuery(window).scrollTop();
+      var viewportBottom = viewportTop + jQuery(window).height();
+
+      return (elementBottom > viewportTop && elementTop < viewportBottom);
+	}
+			
+			<?php 
+		}
 		
 	} //end class
+	
+		
 	

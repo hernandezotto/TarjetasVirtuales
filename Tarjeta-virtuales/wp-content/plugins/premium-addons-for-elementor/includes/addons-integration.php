@@ -582,6 +582,22 @@ class Addons_Integration {
 		);
 
 		wp_register_script(
+			'velocity-js',
+			PREMIUM_ADDONS_URL . 'assets/frontend/' . $dir . '/velocity' . $suffix . '.js',
+			array( 'jquery' ),
+			PREMIUM_ADDONS_VERSION,
+			true
+		);
+
+		wp_register_script(
+			'velocity-ui-js',
+			PREMIUM_ADDONS_URL . 'assets/frontend/' . $dir . '/velocity-ui' . $suffix . '.js',
+			array( 'jquery' ),
+			PREMIUM_ADDONS_VERSION,
+			true
+		);
+
+		wp_register_script(
 			'pa-slimscroll',
 			PREMIUM_ADDONS_URL . 'assets/frontend/' . $dir . '/jquery-slimscroll' . $suffix . '.js',
 			array( 'jquery' ),

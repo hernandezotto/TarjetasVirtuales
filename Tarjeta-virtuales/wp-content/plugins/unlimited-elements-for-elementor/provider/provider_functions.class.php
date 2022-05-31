@@ -52,8 +52,21 @@ class UniteProviderFunctionsUC{
 		$uploadPath = $arrUploadDir["basedir"]."/";
 		
 		GlobalsUC::$path_images = $arrUploadDir["basedir"]."/";
+
+		//set cache folder
 		
-		GlobalsUC::$path_cache = GlobalsUC::$pathPlugin."cache/";
+		try{
+			
+			GlobalsUC::$path_cache = GlobalsUC::$path_images."unlimited_elements_cache/";
+			UniteFunctionsUC::mkdirValidate(GlobalsUC::$path_cache, "cache folder");
+			
+			//create index.html
+			UniteFunctionsUC::writeFile("", GlobalsUC::$path_cache."index.html");
+			
+		}catch(Exception $e){
+		
+			GlobalsUC::$path_cache = GlobalsUC::$pathPlugin."cache/";
+		}
 		
 		GlobalsUC::$url_base = site_url()."/";
 		GlobalsUC::$urlPlugin = plugins_url($pluginName)."/";
@@ -1093,6 +1106,7 @@ class UniteProviderFunctionsUC{
 		call_user_func_array("do_action", $args);
 	}
 		
+	
 	
 }
 ?>

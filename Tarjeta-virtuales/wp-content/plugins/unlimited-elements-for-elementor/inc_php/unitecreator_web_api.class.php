@@ -1283,6 +1283,7 @@ class UniteCreatorWebAPIWork{
 	}
 	
 	
+	
 	/**
 	 * install catalog addon
 	 */
@@ -1335,7 +1336,34 @@ class UniteCreatorWebAPIWork{
 		
 		return($response);
 	}
-
+	
+	/**
+	 * install addon by name
+	 * find the needed category from the catalog
+	 */
+	public function installCatalogAddonByName($name, $addonType){
+		
+		$addon = $this->getAddonByName($name);
+		
+		if(empty($addon))
+			return(false);
+		
+		$cat = UniteFunctionsUC::getVal($addon, "cat");
+		
+		$title = UniteFunctionsUC::getVal($addon, "title");
+		
+		$data = array();
+		$data["name"] = $name;
+		$data["cat"] = $cat;
+		$data["type"] = $addonType;
+		
+		$this->installCatalogAddonFromData($data);
+				
+		$log = "Installed widget: $title";
+		
+		return($log);
+	}
+	
 	
 	/**
 	 * install catalog addon

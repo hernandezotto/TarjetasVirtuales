@@ -42,14 +42,17 @@
 
             //If it was opened, then close it.
             if ($parent.hasClass('premium-active-menu')) {
-
-                $parent.removeClass('premium-active-menu');
+                // $parent.removeClass('premium-active-menu');
+                $parent.toggleClass('premium-active-menu');
 
             } else {
                 //Close any other opened items.
                 $menuContainer.find('.premium-active-menu').toggleClass('premium-active-menu');
                 //Then, open this item.
                 $parent.toggleClass('premium-active-menu');
+
+                // make sure the parent node is always open whenever the child node is opened.
+                $($parent).parents('.premium-nav-menu-item.menu-item-has-children').toggleClass('premium-active-menu');
             }
 
             // make sure the parent node is always open whenever the child node is opened.

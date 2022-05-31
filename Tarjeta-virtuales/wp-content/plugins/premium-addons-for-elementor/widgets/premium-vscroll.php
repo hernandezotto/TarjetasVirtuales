@@ -121,8 +121,6 @@ class Premium_Vscroll extends Widget_Base {
 		return array(
 			'pa-iscroll',
 			'pa-slimscroll',
-			'velocity-js',
-			'velocity-ui-js',
 			'pa-vscroll',
 		);
 	}
@@ -504,20 +502,49 @@ class Premium_Vscroll extends Widget_Base {
 			'scroll_effect',
 			array(
 				'label'   => __( 'Scroll Effect', 'premium-addons-for-elementor' ),
-				'type'    => Controls_Manager::HIDDEN,
+				'type'    => Controls_Manager::SELECT,
 				'options' => array(
-					'default'  => __( 'Default', 'premium-addons-for-elementor' ),
-					'rotate'   => __( 'Fade', 'premium-addons-for-elementor' ),
-					'parallax' => __( 'Parallax', 'premium-addons-for-elementor' ),
+					'default'   => __( 'Default', 'premium-addons-for-elementor' ),
+					'parallax'  => __( 'Parallax', 'premium-addons-for-elementor' ),
+					'scaleDown' => __( 'Zoomed Parallax', 'premium-addons-for-elementor' ),
+					'rotate'    => __( 'Cube', 'premium-addons-for-elementor' ),
 				),
 				'default' => 'default',
 			)
 		);
 
 		$this->add_control(
+			'cube_effect_note',
+			array(
+				'raw'             => __( 'Full Section scroll option is enabled by default for Cube effect for better UX.', 'premium-addons-for-elemeentor' ),
+				'type'            => Controls_Manager::RAW_HTML,
+				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+				'condition'       => array(
+					'scroll_effect' => 'rotate',
+				),
+			)
+		);
+
+		$this->add_control(
+			'new_effect_note',
+			array(
+				'raw'             => __(
+					'Please note that the
+				animation will automatically be changed to default on touch devices for better performance.',
+					'premium-addons-for-elemeentor'
+				),
+				'type'            => Controls_Manager::RAW_HTML,
+				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+				'condition'       => array(
+					'scroll_effect!' => 'default',
+				),
+			)
+		);
+
+		$this->add_control(
 			'scroll_speed',
 			array(
-				'label'       => __( 'Scroll Speed', 'premium-addons-for-elementor' ),
+				'label'       => __( 'Scroll Speed (sec)', 'premium-addons-for-elementor' ),
 				'type'        => Controls_Manager::NUMBER,
 				'description' => __( 'Set scolling speed in seconds, default: 0.7', 'premium-addons-for-elementor' ),
 			)
@@ -526,17 +553,23 @@ class Premium_Vscroll extends Widget_Base {
 		$this->add_control(
 			'scroll_offset',
 			array(
-				'label' => __( 'Scroll Offset', 'premium-addons-for-elementor' ),
-				'type'  => Controls_Manager::NUMBER,
+				'label'     => __( 'Scroll Offset', 'premium-addons-for-elementor' ),
+				'type'      => Controls_Manager::NUMBER,
+				'condition' => array(
+					'scroll_effect!' => array( 'rotate', 'scaleDown' ),
+				),
 			)
 		);
 
 		$this->add_control(
 			'full_section',
 			array(
-				'label'   => __( 'Full Section Scroll', 'premium-addons-for-elementor' ),
-				'type'    => Controls_Manager::SWITCHER,
-				'default' => 'yes',
+				'label'     => __( 'Full Section Scroll', 'premium-addons-for-elementor' ),
+				'type'      => Controls_Manager::SWITCHER,
+				'default'   => 'yes',
+				'condition' => array(
+					'scroll_effect!' => 'rotate',
+				),
 			)
 		);
 
@@ -556,7 +589,8 @@ class Premium_Vscroll extends Widget_Base {
 				'label'     => __( 'Enable Full Section Scroll on Touch Devices', 'premium-addons-for-elementor' ),
 				'type'      => Controls_Manager::SWITCHER,
 				'condition' => array(
-					'full_section' => 'yes',
+					'full_section'   => 'yes',
+					'scroll_effect!' => 'rotate',
 				),
 			)
 		);
@@ -568,7 +602,8 @@ class Premium_Vscroll extends Widget_Base {
 				'type'         => Controls_Manager::SWITCHER,
 				'description'  => __( 'Enable this option to check if sections height is larger than screen height and add a scroll bar for the content', 'premium-addons-for-elementor' ),
 				'condition'    => array(
-					'full_section' => 'yes',
+					'full_section'   => 'yes',
+					'scroll_effect!' => 'rotate',
 				),
 				'separator'    => 'before',
 				'default'      => 'true',
@@ -1111,7 +1146,7 @@ class Premium_Vscroll extends Widget_Base {
 			)
 		);
 
-		if ( 'default' !== $settings['scroll_effect'] ) {
+		if ( 'default' !== $settings['scroll_effect'] && ! wp_is_mobile() ) {
 
 			$this->add_render_attribute(
 				'vscroll_sections_wrap',
@@ -1131,9 +1166,9 @@ class Premium_Vscroll extends Widget_Base {
 			'dotsText'          => $dots_text,
 			'dotsPos'           => $settings['navigation_dots_pos'],
 			'dotsVPos'          => $settings['navigation_dots_v_pos'],
-			'fullSection'       => 'yes' === $settings['full_section'] ? true : false,
-			'fullTouch'         => 'yes' === $settings['full_section_touch'] ? true : false,
-			'fullCheckOverflow' => $settings['full_section_overflow'],
+			'fullSection'       => 'rotate' === $settings['scroll_effect'] || 'yes' === $settings['full_section'] ? true : false,
+			'fullTouch'         => 'rotate' === $settings['scroll_effect'] || 'yes' === $settings['full_section_touch'] ? true : false,
+			'fullCheckOverflow' => 'rotate' === $settings['scroll_effect'] || $settings['full_section_overflow'],
 			'addToHistory'      => 'yes' === $settings['save_state'] ? true : false,
 			'animation'         => $settings['dots_animation'],
 			'duration'          => $settings['dots_animation_duration'],
@@ -1193,6 +1228,11 @@ class Premium_Vscroll extends Widget_Base {
 									),
 								)
 							);
+
+							if ( 0 === $index && 'rotate' === $settings['scroll_effect'] ) {
+								$this->add_render_attribute( 'section_' . $index, 'class', 'visible' );
+							}
+
 							?>
 							<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'section_' . $index ) ); ?>>
 								<?php

@@ -51,14 +51,20 @@ class HelperProviderUC{
 		
 		$arrDate = array(
 			"all"=>__("All","unlimited-elements-for-elementor"),
+			"this_day"=>__("Today","unlimited-elements-for-elementor"),
 			"today"=>__("Past Day","unlimited-elements-for-elementor"),
 			"yesterday"=>__("Past 2 days","unlimited-elements-for-elementor"),
+			
+			"past_from_today"=>__("Past From Today","unlimited-elements-for-elementor"),
+			"past_from_yesterday"=>__("Past From Yesterday","unlimited-elements-for-elementor"),
+			
 			"week"=>__("Past Week","unlimited-elements-for-elementor"),
 			"month"=>__("Past Month","unlimited-elements-for-elementor"),
 			"three_months"=>__("Past 3 Months","unlimited-elements-for-elementor"),
 			"year"=>__("Past Year","unlimited-elements-for-elementor"),
 			"this_month"=>__("This Month","unlimited-elements-for-elementor"),
 			"next_month"=>__("Next Month","unlimited-elements-for-elementor"),
+			
 			"future"=>__("Future From Today","unlimited-elements-for-elementor"),
 			"future_tomorrow"=>__("Future From Tomorrow","unlimited-elements-for-elementor"),
 			"custom"=>__("Custom","unlimited-elements-for-elementor")
@@ -590,5 +596,7 @@ class HelperProviderUC{
 				
 		return($term);
 	}
+	
+	
 	
 }

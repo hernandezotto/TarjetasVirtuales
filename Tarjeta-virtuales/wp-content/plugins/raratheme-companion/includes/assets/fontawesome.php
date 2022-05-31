@@ -12,7 +12,7 @@ return $fontawesome = array (
     'fab fa-500px',
     'fab fa-accessible-icon',
     'fab fa-accusoft',
-    'fab fa-acquisitions-incorporated',
+    // 'fab fa-acquisitions-incorporated',
     'fas fa-ad',
     'fas fa-address-book',
     'far fa-address-book',
@@ -20,7 +20,7 @@ return $fontawesome = array (
     'far fa-address-card',//1
     'fas fa-adjust',
     'fab fa-adn',
-    'fab fa-adobe',
+    // 'fab fa-adobe',
     'fab fa-adversal',
     'fab fa-affiliatetheme',
     'fas fa-air-freshener',
@@ -928,7 +928,7 @@ return $fontawesome = array (
     'fas fa-newspaper',
     'far fa-newspaper',//102
     'fab fa-nimblr',
-    'fab fa-nintendo-switch',
+    // 'fab fa-nintendo-switch',
     'fab fa-node',
     'fab fa-node-js',
     'fas fa-not-equal',
@@ -982,7 +982,7 @@ return $fontawesome = array (
     'fas fa-pen-square',
     'fas fa-pencil-alt',//108
     'fas fa-pencil-ruler',
-    'fab fa-penny-arcade',
+    // 'fab fa-penny-arcade',
     'fas fa-people-carry',
     'fas fa-percent',
     'fas fa-percentage',
@@ -1306,6 +1306,7 @@ return $fontawesome = array (
     'fas fa-thermometer-quarter',
     'fas fa-thermometer-three-quarters',//144
     'fab fa-think-peaks',
+    'fab fa-tiktok',
     'fas fa-thumbs-down',
     'far fa-thumbs-down',
     'fas fa-thumbs-up',
@@ -1341,7 +1342,7 @@ return $fontawesome = array (
     'far fa-trash-alt',
     'fas fa-tree',
     'fab fa-trello',//148
-    'fab fa-tripadvisor',
+    // 'fab fa-tripadvisor',
     'fas fa-trophy',
     'fas fa-truck',
     'fas fa-truck-loading',

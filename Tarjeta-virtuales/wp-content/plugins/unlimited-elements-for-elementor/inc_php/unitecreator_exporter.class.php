@@ -892,9 +892,9 @@ class UniteCreatorExporter extends UniteCreatorExporterBase{
 	 * unpack import addon from temp file
 	 */
 	private function extractImportAddonFile($arrTempFile){
-		
+				
 		$filepath = UniteFunctionsUC::getVal($arrTempFile, "tmp_name");
-		
+				
 		$zip = new UniteZipUC();
 		$extracted = $zip->extract($filepath, $this->pathImportAddon);
 		
@@ -1186,7 +1186,8 @@ class UniteCreatorExporter extends UniteCreatorExporterBase{
 	 * tempFile can be array or filepath
 	 */
 	public function import($catID, $arrTempFile, $overwrite = true, $forceToCat = true){
-			
+		
+		
 		if($this->isImportedOnce == true)
 			UniteFunctionsUC::throwError("The import script can't run twice");
 		

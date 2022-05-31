@@ -470,6 +470,40 @@ Note : This plugin works with Elementor. Make sure you have [Elementor](https://
 
 == Changelog ==
 
+version 1.5.15: 2022-05-30
+
+* Change: set cache folder inside wp-uploads
+* Feature: added option to get terms last level only - for post list / grid
+* Feature: added twig function - get_current_user
+* Feature: disabled right click on html5 galleries (unite gallery)
+* Fix: the image and video repeater was missing default items
+* Fix: fixed load more and filters on a search page
+* Fix: fixed carousel stage padding issues
+* Fix: fixed carousel 1 item one pixel issues
+* Fix: fixed default values in responsive selectors
+
+
+version 1.5.14: 2022-05-24
+
+* Fix: fixed responsive default values with selectors in number and dropdown and slider controls
+* Fix: fixed a bug in run_code_once functionality
+
+
+version 1.5.13: 2022-05-23
+
+
+* Feature: added integration with "sticky posts switch" plugin
+* Feature: added special attribute type - entrance animation
+
+* Fix: fixed sync bug between two similar elements
+* Fix: fixed filters loading with wp-rocket lazy load scripts
+* Fix: fixed put_hide_ids_css function small bug
+* Fix: fixed fetch 2 and more widgets within one section for filtering
+* Fix: fixed slider control js empty output bug
+* Fix: fixed gallery title as number js bug
+* Fix: fixed gallery images from meta fields source as array 
+
+
 
 version 1.5.12: 2022-05-08
 

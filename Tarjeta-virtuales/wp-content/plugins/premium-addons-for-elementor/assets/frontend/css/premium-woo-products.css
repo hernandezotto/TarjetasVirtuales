@@ -877,7 +877,8 @@ html.premium-woo-qv-opened body {
           outline: none; }
   #premium-woo-quick-view-modal .premium-woo-qv-image-slider img {
     -o-object-fit: cover;
-       object-fit: cover; }
+       object-fit: cover;
+    width: 100%; }
 
 #premium-woo-quick-view-content div.images {
   width: 50%;

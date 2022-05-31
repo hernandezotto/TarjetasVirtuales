@@ -505,7 +505,7 @@ class UniteCreatorTemplateEngineWork{
 	/**
 	 * get post terms
 	 */
-	public function getPostTerms($postID, $taxonomy, $addCustomFields = false){
+	public function getPostTerms($postID, $taxonomy, $addCustomFields = false, $type = ""){
 		
 		dmp("no terms in this platform");
 		
@@ -919,6 +919,38 @@ class UniteCreatorTemplateEngineWork{
 			case "put_hide_ids_css":
 				
 				HelperHtmlUC::putHideIdsCss($arg1);
+				
+			break;
+			case "get_posts":
+				
+				$arrPosts = HelperUC::$operations->getPostsFromTwig($arg1,$arg2,$arg3);
+				
+				return($arrPosts);
+			break;
+			case "put_entrance_animation_css":
+				
+				$param = $this->addon->getParamByName($arg1);
+				
+				UniteCreatorEntranceAnimations::putEntranceAnimationCss($this->arrParams, $arg1, $param);
+								
+			break;
+			case "put_entrance_animation_js":
+				
+				$param = $this->addon->getParamByName($arg1);
+				
+				UniteCreatorEntranceAnimations::putEntranceAnimationJs($this->arrParams, $arg1, $param);
+								
+			break;
+			case "get_current_user":
+				
+				$objUser = wp_get_current_user();
+				
+				if(empty($objUser))
+					return(null);
+				
+				$userData = UniteFunctionsWPUC::getUserData($objUser);
+				
+				return($userData);
 				
 			break;
 			default:

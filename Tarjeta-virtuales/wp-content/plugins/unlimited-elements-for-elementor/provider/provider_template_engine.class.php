@@ -86,7 +86,7 @@ class UniteCreatorTemplateEngine extends UniteCreatorTemplateEngineWork{
 	/**
 	 * get post terms
 	 */
-	public function getPostTerms($postID, $taxonomy, $addCustomFields = false){
+	public function getPostTerms($postID, $taxonomy, $addCustomFields = false, $type = ""){
 		
 		$post = get_post($postID);
 		
@@ -96,14 +96,18 @@ class UniteCreatorTemplateEngine extends UniteCreatorTemplateEngineWork{
 		
 		$arrTerms = UniteFunctionsWPUC::getPostSingleTerms($postID, $taxonomy);
 		
+		if($type == "last_level")
+			$arrTerms = UniteFunctionsWPUC::filterTermsLastLevel($arrTerms, $taxonomy);
+		
 		//get single category
 		if(empty($arrTerms))
 			return(array());
 		
 		$arrTermsOutput = $this->objParamsProcessor->modifyArrTermsForOutput($arrTerms, $addCustomFields);
-								
+		
 		return($arrTermsOutput);
 	}
+	
 	
 	/**
 	 * get term meta

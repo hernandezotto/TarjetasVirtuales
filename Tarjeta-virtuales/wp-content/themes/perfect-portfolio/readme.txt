@@ -3,8 +3,8 @@
 Contributors: raratheme
 Requires at least: 4.7
 Requires PHP: 5.6
-Tested up to: 5.9
-Stable tag: 1.1.7
+Tested up to: 6.0
+Stable tag: 1.1.8
 License: GNU General Public License v3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Tags: blog, one-column, two-columns, right-sidebar, left-sidebar, footer-widgets, custom-background, custom-menu, custom-logo, featured-images, threaded-comments, full-width-template, rtl-language-support, translation-ready, theme-options, e-commerce, portfolio
@@ -145,6 +145,10 @@ All other images including icon image and images used in customizer settings are
 
 == Changelog ==
 	
+	1.1.8 - May 29, 2022
+	* Fixed blog page title issue
+	* Fixed page table content design issue 
+
 	1.1.7 - February 04, 2022
 	* Fixed seo issue in author page
 	* Removed schema function for single post

@@ -7334,7 +7334,11 @@ ul.premium-person-social-list {
   visibility: visible; }
 
 .premium-vscroll-dots.middle {
-  top: 50%; }
+  top: 50%;
+  margin-top: 0;
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%); }
 
 .premium-vscroll-dots.top {
   top: 40px; }
@@ -7499,6 +7503,55 @@ ul.premium-person-social-list {
 
 .premium-vscroll-temp .slimScrollBar {
   visibility: hidden; }
+
+[data-hijacking="off"] .premium-vscroll-temp {
+  height: 100vh; }
+  [data-hijacking="off"] .premium-vscroll-temp > div {
+    opacity: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* Force Hardware Acceleration */
+    -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+            backface-visibility: hidden; }
+
+[data-hijacking="off"] .premium-vscroll-temp:first-of-type > div::before {
+  display: none;
+  position: absolute;
+  width: 100%;
+  top: 20px;
+  z-index: 2; }
+
+[data-hijacking="off"][data-animation="rotate"] .premium-vscroll-temp {
+  position: relative;
+  /* enable a 3D-space for children elements */
+  -webkit-perspective: 1800px;
+          perspective: 1800px; }
+  [data-hijacking="off"][data-animation="rotate"] .premium-vscroll-temp > div {
+    position: absolute;
+    -webkit-transform-origin: center bottom;
+        -ms-transform-origin: center bottom;
+            transform-origin: center bottom; }
+  [data-hijacking="off"][data-animation="rotate"] .premium-vscroll-temp:last-of-type > div {
+    opacity: 1 !important;
+    -webkit-transform: translateY(0px) scale(1) rotateX(0deg) !important;
+            transform: translateY(0px) scale(1) rotateX(0deg) !important; }
+
+[data-hijacking="off"][data-animation="parallax"] .premium-vscroll-temp > div {
+  position: fixed; }
+
+[data-hijacking="off"][data-animation="scaleDown"] .premium-vscroll-temp > div {
+  position: fixed; }
+
+[data-hijacking="off"] .premium-vscroll-parallax-last {
+  -webkit-transform: translateY(0px) scale(1) !important;
+      -ms-transform: translateY(0px) scale(1) !important;
+          transform: translateY(0px) scale(1) !important; }
+
+[data-hijacking="off"] .premium-vscroll-parallax-position {
+  position: unset !important; }
 
 /********** Premium Woo Products **********/
 /******************************************/
@@ -8379,7 +8432,8 @@ html.premium-woo-qv-opened body {
           outline: none; }
   #premium-woo-quick-view-modal .premium-woo-qv-image-slider img {
     -o-object-fit: cover;
-       object-fit: cover; }
+       object-fit: cover;
+    width: 100%; }
 
 #premium-woo-quick-view-content div.images {
   width: 50%;

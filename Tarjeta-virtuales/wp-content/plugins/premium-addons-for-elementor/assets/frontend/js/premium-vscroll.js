@@ -27,10 +27,10 @@
     window.premiumVerticalScroll = function ($selector, settings) {
         var self = this,
             $window = $(window),
-            isTouch = 'desktop' !== elementorFrontend.getCurrentDeviceMode(),
+            currentDevice = elementorFrontend.getCurrentDeviceMode(),
+            isTouch = !['desktop', 'widescreen', 'laptop'].includes(currentDevice),
             $instance = $selector,
-            checkTemps = $selector.find(".premium-vscroll-sections-wrap")
-                .length,
+            checkTemps = $selector.find(".premium-vscroll-sections-wrap").length,
             $htmlBody = $("html, body"),
             $itemsList = $(".premium-vscroll-dot-item", $instance),
             $menuItems = $(".premium-vscroll-nav-item", $instance),
@@ -44,12 +44,11 @@
             currentSection = null,
             isScrolling = false,
             inScope = true,
-            scrollings = [];
-
-        var touchStartY = 0,
+            scrollings = [],
+            touchStartY = 0,
             touchEndY = 0;
 
-        //Extend jQuery default easing
+        //Extend jQuery default easing.
         jQuery.extend(jQuery.easing, {
             easeInOutCirc: function (x, t, b, c, d) {
                 if ((t /= d / 2) < 1)
@@ -70,6 +69,8 @@
 
             self.setSectionsData();
 
+            self.vscrollEffects();
+
             $itemsList.on("click.premiumVerticalScroll", self.onNavDotChange);
             $menuItems.on("click.premiumVerticalScroll", self.onNavDotChange);
 
@@ -87,7 +88,7 @@
 
                 self.setSectionsData();
 
-                //Handle Full Section Scroll
+                //Handle Full Section Scroll.
                 if (settings.fullTouch || (!isTouch && settings.fullSection))
                     self.sectionsOverflowRefresh();
 
@@ -137,8 +138,9 @@
 
                 var $this = $(this),
                     sectionId = $this.data("menuanchor"),
+                    animeType = $instance.find('.premium-vscroll-sections-wrap').data('animation'),
                     $section = $("#" + sectionId),
-                    height = $section.outerHeight();
+                    height = animeType ? $section.find('> div').outerHeight() : $section.outerHeight();
 
                 if (height > $window.outerHeight() && height - $window.outerHeight() >= 50) {
 
@@ -146,7 +148,8 @@
 
                     $("#scroller-" + sectionId).slimScroll({
                         height: $window.outerHeight(),
-                        railVisible: false
+                        railVisible: false,
+                        touchScrollStep: 60
                     });
 
                     var iScrollInstance = new IScroll("#scroller-" + sectionId, {
@@ -163,10 +166,7 @@
                     setTimeout(function () {
                         iScrollInstance.refresh();
                     }, 1500);
-
-
                 }
-
             });
         };
 
@@ -206,14 +206,12 @@
                     };
                 }
             });
-
         };
 
         self.fullSectionHandler = function () {
 
             var vSection = document.getElementById($instance.attr("id"));
 
-            //If device is not touch or full section scroll is disabled on touch devices.
             if (!isTouch || !settings.fullTouch) {
 
                 if (checkTemps) {
@@ -310,15 +308,6 @@
 
         };
 
-        // self.isTouchDevice = function () {
-
-        //     var isTouchDevice = navigator.userAgent.match(/(iPhone|iPod|iPad|Android|playbook|silk|BlackBerry|BB10|Windows Phone|Tizen|Bada|webOS|IEMobile|Opera Mini)/),
-        //         isTouch = (('ontouchstart' in window) || (navigator.msMaxTouchPoints > 0) || (navigator.maxTouchPoints));
-
-        //     return isTouchDevice || isTouch;
-
-        // };
-
         self.getEventsPage = function (e) {
 
             var events = [];
@@ -334,7 +323,6 @@
             return events;
 
         };
-
 
         self.onTouchStart = function (e) {
 
@@ -423,7 +411,7 @@
 
                 if ("down" === direction) {
 
-                    if (!prevSectionId && sections[sectionId].offset > windowScrollTop + 5) {
+                    if (!prevSectionId && sections[sectionId].offset - settings.offset > windowScrollTop + 5) {
                         newSectionId = sectionId;
                     } else {
                         newSectionId = nextSectionId;
@@ -635,9 +623,7 @@
                 event.returnValue = false;
 
             }
-
         };
-
 
         self.onAnchorChange = function (sectionId) {
 
@@ -692,13 +678,33 @@
                 return false;
             }
 
+            var $vTarget = self.visible($instance, true, false),
+                dotIndex = $(".premium-vscroll-dot-item.active").index(),
+                animationType = $instance.find('.premium-vscroll-sections-wrap').data('animation');
+
             if ("up" === direction) {
                 if (prevItem[0]) {
                     prevItem.trigger("click.premiumVerticalScroll");
+                    if (dotIndex === $itemsList.length - 1 && !$vTarget) {
+                        prevItem = $(".premium-vscroll-dot-item[data-menuanchor=" + currentSection + "]", $instance);
+                    } else if (dotIndex === $itemsList.length - 1 && ($instance.offset().top + $instance.innerHeight() - $(document).scrollTop() < 600)) {
+                        prevItem = $(".premium-vscroll-dot-item[data-menuanchor=" + currentSection + "]", $instance);
+                    } else {
+                        $instance.find('.premium-vscroll-sections-wrap[data-animation=' + animationType + '] .premium-vscroll-temp:last-of-type>div').removeClass("premium-vscroll-parallax-last");
+                        $instance.find('.premium-vscroll-sections-wrap[data-animation=' + animationType + '] .premium-vscroll-temp>div').removeClass("premium-vscroll-parallax-position");
+                        // prevItem = $(".premium-vscroll-dot-item[data-menuanchor=" + currentSection + "]", $instance).prev(),
+                    }
+
                 }
             } else {
                 if (nextItem[0]) {
                     nextItem.trigger("click.premiumVerticalScroll");
+                    if ($instance.offset().top - $(document).scrollTop() > 200) {
+                        nextItem = $(".premium-vscroll-dot-item[data-menuanchor=" + currentSection + "]", $instance);
+                    }
+                    // else {
+                    //     // nextItem = $(".premium-vscroll-dot-item[data-menuanchor=" + currentSection + "]", $instance).next(),
+                    // }
                 }
             }
         };
@@ -720,6 +726,29 @@
         }
 
         var prevTime = new Date().getTime();
+
+        //Used to unset position CSS property for vertical scroll sections becuase it causes position issue for the content below the widget.
+        function parallaxLastSection() {
+            var $target = $(event.target),
+                sectionSelector = checkTemps ? ".premium-vscroll-temp" : ".elementor-top-section",
+                $section = $target.closest(sectionSelector),
+                sectionId = $section.attr("id"),
+                $lastselector = checkTemps ? $instance : $("#" + sectionId),
+                animationType = $instance.find('.premium-vscroll-sections-wrap').data('animation');
+
+            if (animationType) {
+
+                if ($lastselector.offset().top + $lastselector.innerHeight() - $(document).scrollTop() + settings.offset < $window.outerHeight()) {
+                    $instance.find('.premium-vscroll-sections-wrap[data-animation=' + animationType + '] .premium-vscroll-temp:last-of-type > div').addClass("premium-vscroll-parallax-last");
+                    $instance.find('.premium-vscroll-sections-wrap[data-animation=' + animationType + '] .premium-vscroll-temp>div').addClass("premium-vscroll-parallax-position");
+
+                } else {
+                    $instance.find('.premium-vscroll-sections-wrap[data-animation=' + animationType + '] .premium-vscroll-temp:last-of-type > div').removeClass("premium-vscroll-parallax-last");
+                    $instance.find('.premium-vscroll-sections-wrap[data-animation=' + animationType + '] .premium-vscroll-temp > div').removeClass("premium-vscroll-parallax-position");
+                }
+            }
+        }
+
         self.onWheel = function (event) {
 
             if (inScope && !isTouch) {
@@ -760,6 +789,8 @@
                 scrollings = [];
             }
 
+            parallaxLastSection();
+
             if (isTouch) {
 
                 $(".premium-vscroll-tooltip").hide();
@@ -795,7 +826,7 @@
                         newSectionId = prevSectionId;
                     }
                 } else {
-                    if (!prevSectionId && sections[sectionId].offset > windowScrollTop + 5) {
+                    if (!prevSectionId && sections[sectionId].offset - settings.offset > windowScrollTop + 5) {
                         newSectionId = sectionId;
                     } else {
                         newSectionId = nextSectionId;
@@ -828,7 +859,6 @@
                         //         iScrollInstance.enable();
                         //     }, settings.speed);
                         // }
-
                     }
 
                 } else {
@@ -849,9 +879,7 @@
                             $instance.find(".premium-vscroll-dots, .premium-vscroll-nav-menu").addClass("premium-vscroll-dots-hide");
                         }
                     } else if ("up" === direction) {
-
                         $instance.find(".premium-vscroll-dots, .premium-vscroll-nav-menu").addClass("premium-vscroll-dots-hide");
-
                     }
                 }
             }
@@ -905,8 +933,131 @@
             }
 
             return Math.ceil(sum / number);
-        }
+        };
 
+        self.vscrollEffects = function () {
+
+            var animationType = $instance.find('.premium-vscroll-sections-wrap').data('animation');
+
+            if (animationType) {
+
+                var sectionsAvailable = $instance.find('.premium-vscroll-temp');
+
+                bindEvents(true);
+
+                function bindEvents(bool) {
+
+                    if (bool) {
+                        //bind the animation to the window scroll event, arrows click and keyboard.
+                        scrollAnimation();
+                        $(window).on('scroll', scrollAnimation);
+                    }
+                }
+
+                function scrollAnimation() {
+
+                    //We don't want scroll functions to be triggered if behance project lightbox is opened.
+                    if ($(".eb-project-overlay").length > 0)
+                        return;
+
+                    //normal scroll - use requestAnimationFrame (if defined) to optimize performance.
+                    (!window.requestAnimationFrame) ? animateSection() : window.requestAnimationFrame(animateSection);
+                }
+
+                function animateSection() {
+
+                    var scrollTop = $(window).scrollTop(),
+                        windowHeight = $(window).height();
+
+                    sectionsAvailable.each(function () {
+                        var actualBlock = $(this),
+                            offset = scrollTop - actualBlock.offset().top;
+
+                        // according to animation type and window scroll, define animation parameters.
+                        var animationValues = setSectionAnimation(offset, windowHeight, animationType);
+
+                        transformSection(actualBlock.children('div'), animationValues[0], animationValues[1], animationValues[2], animationValues[3]);
+
+                        (offset >= 0 && offset < windowHeight) ? actualBlock.addClass('visible') : actualBlock.removeClass('visible');
+                    });
+                }
+
+                function transformSection(element, translateY, rotateXValue, opacityValue, scaleValue) {
+
+                    element.css({
+                        transform: 'translateY(' + translateY + 'vh) rotateX(' + rotateXValue + ') scale(' + scaleValue + ')',
+                        // rotateX: rotateXValue,
+                        opacity: opacityValue
+                    });
+                }
+
+                function setSectionAnimation(sectionOffset, windowHeight, animationName) {
+
+                    // select section animation - normal scroll
+                    var translateY = 100,
+                        rotateX = '0deg',
+                        opacity = 1,
+                        scale = 1,
+                        boxShadowBlur = 0;
+
+                    if (sectionOffset >= -windowHeight && sectionOffset <= 0) {
+                        // section entering the viewport.
+                        translateY = (-sectionOffset) * 100 / windowHeight;
+
+                        if ('rotate' === animationName) {
+                            translateY = 0;
+                            rotateX = '0deg';
+                        } else if ('scaleDown' === animationName) {
+                            scale = 1;
+                            opacity = 1;
+                        }
+
+                    } else if (sectionOffset > 0 && sectionOffset <= windowHeight) {
+                        //section leaving the viewport - still has the '.visible' class.
+                        if ('rotate' === animationName) {
+                            opacity = (1 - (sectionOffset / windowHeight)).toFixed(5);
+                            rotateX = sectionOffset * 100 / windowHeight + 'deg';
+                            translateY = 0;
+                        } else if ('scaleDown' === animationName) {
+                            scale = (1 - (sectionOffset * 0.3 / windowHeight)).toFixed(5);
+                            opacity = (1 - (sectionOffset / windowHeight)).toFixed(5);
+                            translateY = 0;
+                            boxShadowBlur = 40 * (sectionOffset / windowHeight);
+
+                        } else { //parallax
+                            translateY = (-sectionOffset) * 50 / windowHeight;
+                        }
+
+                    } else if (sectionOffset < -windowHeight) {
+                        //section not yet visible.
+                        translateY = 100;
+
+                        if ('scaleDown' === animationName) {
+                            scale = 1;
+                            opacity = 1;
+                        }
+
+                    } else {
+                        //section not visible anymore.
+                        if ('rotate' === animationName) {
+                            translateY = 0;
+                            rotateX = '90deg';
+
+                        } else if ('scaleDown' === animationName) {
+                            scale = 0;
+                            opacity = 0.7;
+                            translateY = 0;
+
+                        } else {
+                            translateY = -50;
+                        }
+                    }
+
+                    return [translateY, rotateX, opacity, scale];
+                }
+
+            }
+        }
     };
 
     $(window).on("elementor/frontend/init", function () {

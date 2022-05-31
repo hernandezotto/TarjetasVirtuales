@@ -75,6 +75,7 @@ GlobalsUC::$arrClientSideText = array(
 		"uc_dropdown"=>esc_html__("Dropdown","unlimited-elements-for-elementor"),
 		"uc_multiple_select"=>esc_html__("Multiple Select","unlimited-elements-for-elementor"),
 		"uc_radioboolean"=>esc_html__("Radio Boolean","unlimited-elements-for-elementor"),
+		"uc_special"=>esc_html__("Special Attribute","unlimited-elements-for-elementor"),
 		"uc_typography"=>esc_html__("Typography","unlimited-elements-for-elementor"),
 		"uc_link"=>esc_html__("Link","unlimited-elements-for-elementor"),
 		"uc_number"=>esc_html__("Number","unlimited-elements-for-elementor"),

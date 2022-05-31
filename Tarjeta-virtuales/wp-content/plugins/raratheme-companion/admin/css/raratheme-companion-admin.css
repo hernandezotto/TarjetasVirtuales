@@ -322,7 +322,7 @@ label[for="widget-rbp_author_widget-3-link_url"] {
 }
 
 .rtc-sortable-links .rtc-social-icon-wrap label,
-.rtc-contact-sortable-links .rtc-contact-social-icon-wrap label, {
+.rtc-contact-sortable-links .rtc-contact-social-icon-wrap label {
     display: block;
     font-weight: 600;
 }
@@ -607,8 +607,6 @@ span.del-user-social-links:hover, .del-raratheme-icon:hover{
     cursor: pointer;
 }
 .raratheme-social-icons-sortable-handle:after, 
-.btab-social-links-sortable-handle:after, 
-.btab-contact-social-links-sortable-handle:after, 
 .widget-client-logo-repeater .link-image-repeat::before,
 .raratheme-img-text-outer .image-text-widget-wrap::before {
     content: "Ξ";

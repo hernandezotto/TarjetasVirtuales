@@ -166,12 +166,17 @@ function UERemoteGeneralAPI(){
 	function changeItem(mixed){
 		
 		var numItem = getItemNum(mixed);
-		
+				
 		var objItem = getItem(numItem);
 		
 		if(objItem == null)
 			return(false);
 		
+		var numCurrent = getNumCurrent();
+		
+		if(numCurrent == numItem)
+			return(false);
+				
 		if(!g_vars.selector_item_trigger){
 			
 			objItem.trigger(g_vars.trigger_event);
@@ -907,7 +912,7 @@ function UESyncObject(){
 	function onItemChange(objAPI){
 		
 		var numCurrent = objAPI.doAction("get_num_current");
-		
+				
 		var objElement = objAPI.getElement();
 		
 		mapAPIs(function(api){
@@ -1047,7 +1052,6 @@ function UESyncObject(){
 			onItemChange(objAPI);
 			
 		});
-		
 		
 		if(g_vars.is_editor == true && g_vars.is_editor_func_started == false){
 			

@@ -236,7 +236,10 @@ class UniteCreatorWooIntegrate{
 		//check and clear sale prices
 		
 		$regularPriceFrom = UniteFunctionsUC::getVal($arrProduct, "woo_regular_price_from");
+		$regularPriceTo = UniteFunctionsUC::getVal($arrProduct, "woo_regular_price_to");
+		
 		$salePriceFrom = UniteFunctionsUC::getVal($arrProduct, "woo_sale_price_from");
+				
 		
 		if($regularPriceFrom === $salePriceFrom){
 			$arrProduct["woo_sale_price_from"] = null;

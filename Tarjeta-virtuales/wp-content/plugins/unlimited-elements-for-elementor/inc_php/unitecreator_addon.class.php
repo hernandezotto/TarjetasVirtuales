@@ -1498,6 +1498,48 @@ defined('UNLIMITED_ELEMENTS_INC') or die('Restricted access');
 			return(null);
 		}
 		
+		/**
+		 * get listing param for addon output
+		 * get only listing / gallery and multisource. skup the remote
+		 */
+		public function getListingParamForOutput(){
+			
+			$arrParams = $this->params;
+			
+			foreach($arrParams as $param){
+				
+				$paramType = UniteFunctionsUC::getVal($param, "type");
+				if($paramType != UniteCreatorDialogParam::PARAM_LISTING)
+					continue;
+
+				$useFor = UniteFunctionsUC::getVal($param, "use_for");
+				
+				if($useFor == "remote")
+					continue;
+								
+				return($param);
+			}
+			
+			return(null);
+		}
+		
+		/**
+		 * get param by name
+		 */
+		public function getParamByName($name){
+			
+			$arrParams = $this->params;
+			
+			foreach($arrParams as $param){
+			
+				$paramName = UniteFunctionsUC::getVal($param, "name");
+				if($paramName == $name)
+					return($param);
+			}
+			
+			return(null);
+			
+		}
 		
 		/**
 		 * get params key->type assoc array

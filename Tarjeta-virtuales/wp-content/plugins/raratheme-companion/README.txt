@@ -5,7 +5,7 @@ Tags: widgets, sidebars, social links, posts
 Requires at least: 4.4.0
 Tested up to: 5.9
 Requires PHP: 5.6
-Stable tag: 1.3.9
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,6 +72,15 @@ RaraTheme Companion provides 23 different handy widgets for sidebars to create a
 1. Plugin backend
 
 == Changelog ==
+
+= 1.4.0 =
+Released on: 17th May, 2022
+
+Enhancements:
+* FontAwesome assests update and icon support added for Tiktok.
+
+Fixes:
+* Minor Bug fixes.
 
 = 1.3.9 =
 Released on: 29th November, 2021

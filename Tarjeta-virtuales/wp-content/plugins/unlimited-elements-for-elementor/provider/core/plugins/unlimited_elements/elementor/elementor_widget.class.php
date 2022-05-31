@@ -478,7 +478,7 @@ class UniteCreatorElementorWidget extends Widget_Base {
      * add items controls
      */
     protected function addItemsControlsUC($itemsType){
-		 
+    	
     	if($itemsType == "listing")
     		return(false);
     	
@@ -498,7 +498,7 @@ class UniteCreatorElementorWidget extends Widget_Base {
     		$itemsLabel = $itemsTitle;
     	    	
     	 if($this->isBGWidget == false){
-    	 	
+    	 	    	 	
 	    	//add multisource condition
 	    	
     	 	$arrSection = array(
@@ -510,7 +510,7 @@ class UniteCreatorElementorWidget extends Widget_Base {
 	    		$condition = array($this->listingName."_source"=>"items");
 	    		$arrSection["condition"] = $condition;
 	    	}
-    	 	
+    	 		    	
 	        $this->start_controls_section('section_items', $arrSection);
     	 	
     	 }
@@ -750,6 +750,7 @@ class UniteCreatorElementorWidget extends Widget_Base {
      * get control array from param
      */
     protected function getControlArrayUC($param, $forItems = false){
+
     	
     	$type = UniteFunctionsUC::getVal($param, "type");
     	$title = UniteFunctionsUC::getVal($param, "title");
@@ -1067,13 +1068,7 @@ class UniteCreatorElementorWidget extends Widget_Base {
     				$defaultValueMobile = UniteFunctionsUC::getVal($param, "default_value_mobile");
 					
     				$defaultValueDesktop = UniteFunctionsUC::getVal($arrControl, "default");
-    				
-    				if(array_key_exists($defaultValueTablet, $options) == false)
-    					$defaultValueTablet = $defaultValueDesktop;
-    				
-    				if(array_key_exists($defaultValueMobile, $options) == false)
-    					$defaultValueMobile = $defaultValueDesktop;
-    				
+    				    				
     				$arrControl["uc_responsive"] = true;
     				
     				$arrControl["desktop_default"] = $defaultValueDesktop;
@@ -1380,10 +1375,9 @@ class UniteCreatorElementorWidget extends Widget_Base {
     				$defaultValueDesktop = UniteFunctionsUC::getVal($param, "default_value");
     				
     				$defaultValueTablet = UniteFunctionsUC::getVal($param, "default_value_tablet");
-    				
-    				if(is_numeric($defaultValueTablet) == false)
-    					$defaultValueTablet = $defaultValueDesktop;
-    				
+    				$defaultValueMobile = UniteFunctionsUC::getVal($param, "default_value_mobile");
+    				    				
+    					
     				$unitTablet = $rangeUnit;
     				
     				if(!empty($defaultValueTablet)){
@@ -1392,12 +1386,7 @@ class UniteCreatorElementorWidget extends Widget_Base {
     					$unitTablet = $arrSize["unit"];
     				}
 
-    				
-    				$defaultValueMobile = UniteFunctionsUC::getVal($param, "default_value_mobile");
-    				
-    				if(is_numeric($defaultValueMobile) == false)
-    					$defaultValueMobile = $defaultValueDesktop;
-    				
+    				    				    				
     				$unitMobile = $rangeUnit;
     				
     				if(!empty($defaultValueMobile)){
@@ -1406,18 +1395,22 @@ class UniteCreatorElementorWidget extends Widget_Base {
     					$unitMobile = $arrSize["unit"];
     				}
     				
-	    			$arrControl["tablet_default"] = array(
-	    				"size" => $defaultValueTablet,
-	    				"unit" => $rangeUnit
-	    			);
+    				if(!empty($defaultValueTablet)){
+		    			$arrControl["tablet_default"] = array(
+		    				"size" => $defaultValueTablet,
+		    				"unit" => $rangeUnit
+		    			);
+    				}
 	    			
-	    			$arrControl["mobile_default"] = array(
-	    				"size" => $defaultValueMobile,
-	    				"unit" => $unitMobile
-	    			);
+    				if(!empty($defaultValueMobile)){
+		    			$arrControl["mobile_default"] = array(
+		    				"size" => $defaultValueMobile,
+		    				"unit" => $unitMobile
+		    			);
+    				}
 	    				    			
     			}
-    		
+			
     		break;
     		case UniteCreatorDialogParam::PARAM_NUMBER:
     			
@@ -1431,12 +1424,6 @@ class UniteCreatorElementorWidget extends Widget_Base {
     				
     				$defaultTablet = UniteFunctionsUC::getVal($param, "default_value_tablet",$defaultValue);
     				$defaultMobile = UniteFunctionsUC::getVal($param, "default_value_mobile",$defaultValue);
-    				
-    				if(is_numeric($defaultTablet) == false)
-    					$defaultTablet = $defaultValue;
-   				
-    				if(is_numeric($defaultMobile) == false)
-    					$defaultMobile = $defaultValue;
      				
 	    			$arrControl["desktop_default"] = $defaultValue;
 	    			$arrControl["tablet_default"] = $defaultTablet;
@@ -1738,7 +1725,7 @@ class UniteCreatorElementorWidget extends Widget_Base {
      * add elementor param
      */
     protected function addElementorParamUC($param, $objControls = null){
-    	
+    	  
     	if(empty($objControls))
     		$objControls = $this->objControls;
     	
@@ -1765,6 +1752,7 @@ class UniteCreatorElementorWidget extends Widget_Base {
     		case UniteCreatorDialogParam::PARAM_TEMPLATE:
     		case UniteCreatorDialogParam::PARAM_MENU:
     		case UniteCreatorDialogParam::PARAM_LISTING:
+    		case UniteCreatorDialogParam::PARAM_SPECIAL:
     			
     			$settings = new UniteCreatorSettings();
     			
@@ -2259,6 +2247,7 @@ class UniteCreatorElementorWidget extends Widget_Base {
          $allParams = $this->objAddon->getProcessedMainParams();
          $arrCats = $this->objAddon->getParamsCats();
          
+         
          $isNoSettings = false;
          if(empty($allParams))
          	$isNoSettings = true;
@@ -2460,7 +2449,8 @@ class UniteCreatorElementorWidget extends Widget_Base {
 	        
 	        $this->end_controls_section();
          }
-          
+
+         
           // --- add items
           if($isItemsEnabled == true && $itemsType != "image")
           	$this->addItemsControlsUC($itemsType);
@@ -3408,7 +3398,7 @@ class UniteCreatorElementorWidget extends Widget_Base {
     	
     	//----- by listing
     	
-    	$arrListingParam = $objAddon->getParamByType(UniteCreatorDialogParam::PARAM_LISTING);
+    	$arrListingParam = $objAddon->getListingParamForOutput();
     	
     	if(!empty($arrListingParam)){
     		
@@ -3508,7 +3498,7 @@ class UniteCreatorElementorWidget extends Widget_Base {
     			$arrMainParamValues[$postListName."_pagination_type"] = $paginationType;    			    			
     		}
 	    	
-    		$arrListingParam = $objAddon->getParamByType(UniteCreatorDialogParam::PARAM_LISTING);
+    		$arrListingParam = $objAddon->getListingParamForOutput();
     		if(!empty($arrListingParam)){
     			
     			$paginationType = UniteFunctionsUC::getVal($arrMainParamValues, "pagination_type");
